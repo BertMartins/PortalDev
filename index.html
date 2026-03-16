@@ -3,1604 +3,2219 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>API Payload Generator</title>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<title>NEXUS — Dev & QA Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Exo+2:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#080d19;--bg2:#0e1525;--card:#131b2e;--card2:#1a2440;
-  --border:#1e2d4a;--border2:#2a3f66;
-  --text:#e0e7f1;--text2:#94a3c0;--text3:#5c6f8a;
-  --accent:#00e5a0;--accent2:#00c48a;--accent-glow:rgba(0,229,160,.15);
-  --secondary:#f97066;--secondary2:#fb923c;
-  --info:#38bdf8;--warn:#fbbf24;--error:#ef4444;--success:#22c55e;
-  --radius:10px;--radius-sm:6px;
-  --font:'Lexend',sans-serif;--mono:'Fira Code',monospace;
-  --shadow:0 4px 24px rgba(0,0,0,.3);
-  --transition:all .25s cubic-bezier(.4,0,.2,1);
+/* ===================== CSS VARIABLES ===================== */
+:root {
+  --bg-primary: #070b12;
+  --bg-secondary: #0c1220;
+  --bg-card: #111a2e;
+  --bg-card-hover: #162040;
+  --bg-input: #0e1628;
+  --accent: #00e5ff;
+  --accent-glow: rgba(0, 229, 255, 0.25);
+  --accent2: #a855f7;
+  --accent2-glow: rgba(168, 85, 247, 0.2);
+  --gradient: linear-gradient(135deg, #00e5ff, #a855f7);
+  --gradient-btn: linear-gradient(135deg, #00c8e0, #8b3ee0);
+  --text-primary: #e4eaf4;
+  --text-secondary: #7b8ba6;
+  --text-muted: #4a5670;
+  --border: #1a2540;
+  --border-focus: #00e5ff;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --sidebar-width: 260px;
+  --topbar-height: 56px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.3);
+  --shadow-glow: 0 0 20px var(--accent-glow);
+  --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+  --font-display: 'Orbitron', sans-serif;
+  --font-heading: 'Exo 2', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-code: 'Fira Code', monospace;
 }
-html.light{
-  --bg:#f0f2f5;--bg2:#e4e7ec;--card:#ffffff;--card2:#f7f8fa;
-  --border:#d1d5db;--border2:#b0b8c4;
-  --text:#1a1f2e;--text2:#4b5563;--text3:#9ca3af;
-  --accent:#059669;--accent2:#047857;--accent-glow:rgba(5,150,105,.1);
-  --secondary:#dc2626;--secondary2:#ea580c;
-  --info:#2563eb;--warn:#d97706;--error:#dc2626;--success:#16a34a;
-  --shadow:0 4px 24px rgba(0,0,0,.08);
+
+html:not(.dark) {
+  --bg-primary: #f4f6fb;
+  --bg-secondary: #eaeff7;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f4ff;
+  --bg-input: #f0f3fa;
+  --text-primary: #0f172a;
+  --text-secondary: #4b5c78;
+  --text-muted: #94a3b8;
+  --border: #d4dce8;
+  --border-focus: #0090a8;
+  --accent: #0090a8;
+  --accent-glow: rgba(0, 144, 168, 0.15);
+  --accent2: #7c3aed;
+  --accent2-glow: rgba(124, 58, 237, 0.12);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.07);
 }
-body{
-  font-family:var(--font);background:var(--bg);color:var(--text);
-  min-height:100vh;overflow-x:hidden;line-height:1.5;
+
+/* ===================== RESET & BASE ===================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
 }
-body::before{
-  content:'';position:fixed;inset:0;
-  background:radial-gradient(ellipse at 20% 0%,rgba(0,229,160,.04) 0%,transparent 60%),
-             radial-gradient(ellipse at 80% 100%,rgba(249,112,102,.03) 0%,transparent 60%);
-  pointer-events:none;z-index:0;
+input, textarea, select, button { font-family: inherit; font-size: 16px; }
+a { color: var(--accent); text-decoration: none; }
+
+/* ===================== SCROLLBAR ===================== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+
+/* ===================== ANIMATED BG ===================== */
+.grid-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 30%, var(--accent-glow) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, var(--accent2-glow) 0%, transparent 50%),
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+  opacity: 0.5;
+  animation: gridPulse 8s ease-in-out infinite alternate;
 }
-.app{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:16px 16px 80px}
-/* Header */
-.header{text-align:center;padding:32px 16px 24px;position:relative}
-.header-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--accent-glow);border:1px solid rgba(0,229,160,.25);
-  padding:4px 14px;border-radius:20px;font-size:11px;font-weight:500;
-  color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;
+@keyframes gridPulse {
+  0% { opacity: 0.35; }
+  100% { opacity: 0.55; }
 }
-.header h1{
-  font-size:clamp(24px,5vw,38px);font-weight:700;
-  background:linear-gradient(135deg,var(--accent),var(--info),var(--secondary));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;line-height:1.2;
+
+/* ===================== VIEWS ===================== */
+.view { display: none; min-height: 100vh; position: relative; z-index: 1; }
+.view.active { display: flex; flex-direction: column; }
+
+/* ===================== LANDING PAGE ===================== */
+#landing {
+  align-items: center; justify-content: center; padding: 24px;
+  animation: fadeIn 0.6s ease-out;
 }
-.header p{color:var(--text2);margin-top:8px;font-size:14px;max-width:600px;margin-inline:auto}
-/* Tabs */
-.tabs{
-  display:flex;gap:4px;overflow-x:auto;padding:4px;
-  background:var(--card);border-radius:var(--radius);
-  border:1px solid var(--border);margin:24px 0 20px;
-  scrollbar-width:none;-ms-overflow-style:none;
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.landing-content { text-align: center; max-width: 840px; width: 100%; }
+.brand { font-family: var(--font-display); font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 900; letter-spacing: 6px; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; }
+.brand-sub { font-family: var(--font-heading); font-size: clamp(0.85rem, 2vw, 1.1rem); color: var(--text-secondary); font-weight: 300; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 48px; }
+
+.role-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; margin-bottom: 32px; }
+
+.role-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 28px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  animation: cardIn 0.7s ease-out backwards;
 }
-.tabs::-webkit-scrollbar{display:none}
-.tab-btn{
-  flex-shrink:0;padding:10px 16px;border:none;background:none;
-  color:var(--text3);font-family:var(--font);font-size:13px;font-weight:500;
-  cursor:pointer;border-radius:var(--radius-sm);transition:var(--transition);
-  display:flex;align-items:center;gap:6px;white-space:nowrap;
+.role-card:nth-child(2) { animation-delay: 0.15s; }
+.role-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--gradient); opacity: 0; transition: var(--transition);
 }
-.tab-btn:hover{color:var(--text);background:var(--card2)}
-.tab-btn.active{color:var(--accent);background:var(--accent-glow);font-weight:600}
-.tab-btn i{font-size:12px}
-.tab-panel{display:none;animation:fadeIn .3s ease}
-.tab-panel.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-/* Cards */
-.card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--radius);padding:20px;margin-bottom:16px;
-  box-shadow:var(--shadow);
+.role-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: var(--shadow-glow); }
+.role-card:hover::before { opacity: 1; }
+@keyframes cardIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+.role-icon { font-size: 2.4rem; margin-bottom: 16px; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.role-title { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+.role-desc { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5; }
+.role-features { list-style: none; }
+.role-features li { color: var(--text-secondary); font-size: 0.88rem; padding: 4px 0; display: flex; align-items: center; gap: 8px; }
+.role-features li::before { content: '▸'; color: var(--accent); font-weight: bold; }
+
+/* ===================== TOPBAR ===================== */
+.topbar {
+  height: var(--topbar-height); background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 20px; gap: 16px;
+  position: sticky; top: 0; z-index: 100;
 }
-.card-title{
-  font-size:15px;font-weight:600;color:var(--text);
-  margin-bottom:14px;display:flex;align-items:center;gap:8px;
+.topbar-brand { font-family: var(--font-display); font-size: 1rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: 3px; }
+.topbar-sep { width: 1px; height: 24px; background: var(--border); }
+.topbar-role { font-family: var(--font-heading); font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+.topbar-spacer { flex: 1; }
+.btn-back {
+  background: none; border: 1px solid var(--border); color: var(--text-secondary);
+  padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer;
+  font-size: 0.85rem; transition: var(--transition); display: flex; align-items: center; gap: 6px;
 }
-.card-title i{color:var(--accent);font-size:14px}
-/* Form elements */
-label{font-size:13px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px}
-input,select,textarea{
-  width:100%;padding:10px 12px;font-family:var(--font);font-size:14px;
-  background:var(--bg2);border:1px solid var(--border);color:var(--text);
-  border-radius:var(--radius-sm);transition:var(--transition);outline:none;
-  min-font-size:16px;font-size:16px;
+.btn-back:hover { border-color: var(--accent); color: var(--accent); }
+.btn-menu {
+  display: none; background: none; border: none; color: var(--text-primary);
+  font-size: 1.3rem; cursor: pointer; padding: 4px;
 }
-input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
-input.error,select.error{border-color:var(--error);box-shadow:0 0 0 3px rgba(239,68,68,.15)}
-textarea{font-family:var(--mono);font-size:13px;resize:vertical;min-height:120px}
-select{cursor:pointer;appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3c0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
+
+/* ===================== WORKSPACE LAYOUT ===================== */
+.workspace-body { display: flex; flex: 1; min-height: calc(100vh - var(--topbar-height)); }
+
+.sidebar {
+  width: var(--sidebar-width); background: var(--bg-secondary);
+  border-right: 1px solid var(--border); padding: 16px 12px;
+  display: flex; flex-direction: column; gap: 4px;
+  overflow-y: auto; flex-shrink: 0;
+  transition: transform 0.3s ease;
 }
-/* Buttons */
-.btn{
-  padding:10px 20px;border:none;border-radius:var(--radius-sm);
-  font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;
-  display:inline-flex;align-items:center;gap:8px;transition:var(--transition);
+.sidebar-title { font-family: var(--font-heading); font-size: 0.7rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; padding: 12px 12px 8px; font-weight: 600; }
+
+.sidebar-item {
+  display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+  border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition);
+  color: var(--text-secondary); font-size: 0.9rem; border: none; background: none;
+  text-align: left; width: 100%; font-weight: 500;
 }
-.btn-primary{background:var(--accent);color:#080d19}
-.btn-primary:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,229,160,.3)}
-.btn-secondary{background:var(--card2);color:var(--text);border:1px solid var(--border)}
-.btn-secondary:hover{border-color:var(--border2);background:var(--border)}
-.btn-danger{background:rgba(239,68,68,.1);color:var(--error);border:1px solid rgba(239,68,68,.2)}
-.btn-danger:hover{background:rgba(239,68,68,.2)}
-.btn-sm{padding:6px 12px;font-size:12px}
-.btn-icon{
-  width:32px;height:32px;padding:0;display:inline-flex;align-items:center;
-  justify-content:center;border-radius:var(--radius-sm);border:1px solid var(--border);
-  background:var(--card2);color:var(--text2);cursor:pointer;transition:var(--transition);
+.sidebar-item i { width: 20px; text-align: center; font-size: 0.95rem; }
+.sidebar-item:hover { background: var(--bg-card); color: var(--text-primary); }
+.sidebar-item.active { background: var(--bg-card); color: var(--accent); border-left: 3px solid var(--accent); }
+.sidebar-item .badge {
+  margin-left: auto; background: var(--accent); color: var(--bg-primary); font-size: 0.65rem;
+  padding: 2px 7px; border-radius: 10px; font-weight: 700;
 }
-.btn-icon:hover{color:var(--text);border-color:var(--border2)}
-.btn-icon.delete:hover{color:var(--error);border-color:var(--error)}
-/* Field rows */
-.field-row{
-  display:grid;grid-template-columns:1fr 160px auto auto;gap:8px;
-  align-items:start;padding:10px 12px;
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);margin-bottom:8px;
-  transition:var(--transition);position:relative;
+
+/* ===================== MAIN CONTENT ===================== */
+.main-content {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  background: var(--bg-primary);
 }
-.field-row:hover{border-color:var(--border2)}
-.field-row .field-num{
-  position:absolute;left:-8px;top:-8px;
-  width:22px;height:22px;border-radius:50%;
-  background:var(--accent);color:#080d19;
-  font-size:10px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
+.content-header {
+  padding: 20px 28px 0; border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
 }
-.field-row input,.field-row select{background:var(--card);font-size:14px}
-.field-actions{display:flex;gap:4px;align-items:center;padding-top:2px}
-.field-options{
-  grid-column:1/-1;padding-top:8px;margin-top:8px;
-  border-top:1px dashed var(--border);
-  display:none;
+.content-title { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+.content-desc { color: var(--text-secondary); font-size: 0.88rem; }
+
+.content-body { flex: 1; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+
+/* ===================== STACK CONFIG ===================== */
+.config-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.config-group label {
+  display: block; font-family: var(--font-heading); font-size: 0.8rem;
+  color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 6px; font-weight: 600;
 }
-.field-options.visible{display:block}
-.field-options .opts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
-.field-options input{font-size:13px;padding:7px 10px}
-.toggle-wrap{display:flex;align-items:center;gap:8px;padding-top:2px}
-.toggle{
-  position:relative;width:38px;height:20px;border-radius:10px;
-  background:var(--border);cursor:pointer;transition:var(--transition);flex-shrink:0;
+.config-group select, .config-group input[type="text"] {
+  width: 100%; padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text-primary); font-size: 16px;
+  transition: var(--transition); appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237b8ba6' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
 }
-.toggle.on{background:var(--accent)}
-.toggle::after{
-  content:'';position:absolute;top:2px;left:2px;
-  width:16px;height:16px;border-radius:50%;background:#fff;
-  transition:var(--transition);
+.config-group input[type="text"] { background-image: none; }
+.config-group select:focus, .config-group input[type="text"]:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+.chip-container { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg-input); color: var(--text-secondary);
+  transition: var(--transition); user-select: none;
 }
-.toggle.on::after{transform:translateX(18px)}
-.toggle-label{font-size:12px;color:var(--text2)}
-/* Inline row for config */
-.inline-row{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
-.inline-row .form-group{flex:1;min-width:120px}
-.form-group{margin-bottom:0}
-.form-group+.form-group{margin-top:0}
-/* JSON Preview */
-.json-preview{
-  background:var(--bg);border:1px solid var(--border);
-  border-radius:var(--radius-sm);padding:16px;
-  font-family:var(--mono);font-size:13px;line-height:1.6;
-  color:var(--text);max-height:500px;overflow:auto;
-  white-space:pre-wrap;word-break:break-all;
+.chip:hover { border-color: var(--accent); color: var(--text-primary); }
+.chip.selected { background: var(--accent); color: var(--bg-primary); border-color: var(--accent); font-weight: 600; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px;
+  background: var(--gradient-btn); color: #fff; border: none; border-radius: var(--radius-sm);
+  font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: var(--transition);
+  font-family: var(--font-heading); letter-spacing: 0.5px;
 }
-.json-preview .key{color:var(--info)}
-.json-preview .string{color:var(--accent)}
-.json-preview .number{color:var(--secondary2)}
-.json-preview .boolean{color:var(--warn)}
-.json-preview .null{color:var(--text3)}
-/* Export buttons */
-.export-grid{display:flex;flex-wrap:wrap;gap:8px}
-/* Toast */
-.toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
-.toast{
-  padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;
-  box-shadow:var(--shadow);animation:slideIn .3s ease;
-  display:flex;align-items:center;gap:8px;min-width:250px;
+.btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+  background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-weight: 500; font-size: 0.88rem; cursor: pointer;
+  transition: var(--transition);
 }
-.toast.success{background:#065f46;color:#a7f3d0;border:1px solid #059669}
-.toast.error{background:#7f1d1d;color:#fca5a5;border:1px solid #dc2626}
-.toast.info{background:#1e3a5f;color:#93c5fd;border:1px solid #2563eb}
-html.light .toast.success{background:#dcfce7;color:#166534;border-color:#86efac}
-html.light .toast.error{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
-html.light .toast.info{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
-@keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
-/* Stats grid */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
-.stat-card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);padding:14px;text-align:center;
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+.stack-summary {
+  display: flex; flex-wrap: wrap; gap: 8px; padding: 16px; background: var(--bg-card);
+  border-radius: var(--radius-sm); border: 1px solid var(--border);
 }
-.stat-card .stat-val{font-size:24px;font-weight:700;line-height:1.2}
-.stat-card .stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
-.stat-card.green .stat-val{color:var(--success)}
-.stat-card.red .stat-val{color:var(--error)}
-.stat-card.blue .stat-val{color:var(--info)}
-.stat-card.yellow .stat-val{color:var(--warn)}
-/* Progress */
-.progress-bar{
-  width:100%;height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin:12px 0;
+.stack-tag {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+  background: var(--bg-input); border-radius: 16px; font-size: 0.8rem;
+  color: var(--accent); border: 1px solid var(--border); font-family: var(--font-code);
 }
-.progress-bar .fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s ease;width:0}
-/* Results table */
-.results-table{width:100%;border-collapse:collapse;font-size:13px}
-.results-table th{
-  text-align:left;padding:10px 12px;background:var(--bg2);
-  color:var(--text2);font-weight:600;font-size:11px;
-  text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);
+.stack-tag i { font-size: 0.75rem; }
+
+/* ===================== CHAT AREA ===================== */
+.chat-container { flex: 1; display: flex; flex-direction: column; }
+.chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding-bottom: 16px; }
+
+.message {
+  display: flex; gap: 12px; animation: msgIn 0.3s ease-out;
+  max-width: 100%;
 }
-.results-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text)}
-.results-table tr:hover td{background:var(--bg2)}
-.status-badge{
-  padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;
+@keyframes msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.msg-avatar {
+  width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 0.85rem; flex-shrink: 0; font-weight: 700;
 }
-.status-badge.ok{background:rgba(34,197,94,.15);color:var(--success)}
-.status-badge.fail{background:rgba(239,68,68,.15);color:var(--error)}
-/* Templates list */
-.template-item{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px;background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);margin-bottom:8px;
+.msg-avatar.user { background: var(--gradient-btn); color: #fff; }
+.msg-avatar.ai { background: var(--bg-card); color: var(--accent); border: 1px solid var(--border); }
+
+.msg-body { flex: 1; min-width: 0; }
+.msg-name { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; font-family: var(--font-heading); }
+.msg-content {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 14px 18px; font-size: 0.92rem; line-height: 1.7; overflow-x: auto;
 }
-.template-item:hover{border-color:var(--border2)}
-.template-info{flex:1;min-width:0}
-.template-name{font-weight:600;font-size:14px;color:var(--text)}
-.template-meta{font-size:12px;color:var(--text3);margin-top:2px}
-.template-actions{display:flex;gap:6px;flex-shrink:0}
-/* Empty state */
-.empty-state{text-align:center;padding:40px 20px;color:var(--text3)}
-.empty-state i{font-size:40px;margin-bottom:12px;display:block;opacity:.4}
-.empty-state p{font-size:14px}
-/* Modal */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9998;
-  display:flex;align-items:center;justify-content:center;
-  padding:16px;animation:fadeIn .2s ease;
+.msg-content p { margin-bottom: 10px; }
+.msg-content p:last-child { margin-bottom: 0; }
+.msg-content ul, .msg-content ol { padding-left: 20px; margin-bottom: 10px; }
+.msg-content li { margin-bottom: 4px; }
+.msg-content h1, .msg-content h2, .msg-content h3, .msg-content h4 {
+  font-family: var(--font-heading); margin: 16px 0 8px; font-weight: 700;
 }
-.modal{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--radius);padding:24px;width:100%;max-width:480px;
-  box-shadow:0 20px 60px rgba(0,0,0,.4);
+.msg-content h1 { font-size: 1.4rem; }
+.msg-content h2 { font-size: 1.2rem; }
+.msg-content h3 { font-size: 1.05rem; }
+.msg-content strong { color: var(--accent); }
+.msg-content a { color: var(--accent); text-decoration: underline; }
+.msg-content table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.88rem; }
+.msg-content th, .msg-content td { padding: 8px 12px; border: 1px solid var(--border); text-align: left; }
+.msg-content th { background: var(--bg-input); font-weight: 600; }
+.msg-content blockquote { border-left: 3px solid var(--accent); padding-left: 14px; margin: 10px 0; color: var(--text-secondary); }
+
+/* Code blocks inside messages */
+.msg-content pre {
+  background: #1a1e2e; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 0; margin: 12px 0; position: relative; overflow: hidden;
 }
-.modal h3{font-size:16px;font-weight:600;margin-bottom:12px}
-.modal p{font-size:14px;color:var(--text2);margin-bottom:20px}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end}
-/* Responsive */
-@media(max-width:640px){
-  .field-row{grid-template-columns:1fr;gap:6px}
-  .field-actions{justify-content:flex-end}
-  .field-row .field-num{left:-4px;top:-4px}
-  .inline-row{flex-direction:column}
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .tab-btn{padding:8px 12px;font-size:12px}
-  .tab-btn span.tab-text{display:none}
-  .header h1{font-size:22px}
-  .app{padding:10px 10px 60px}
+html:not(.dark) .msg-content pre { background: #f6f8fa; }
+
+.code-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 14px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border);
+  font-size: 0.75rem; font-family: var(--font-code); color: var(--text-muted);
 }
-.hidden{display:none!important}
-.mb-12{margin-bottom:12px}
-.mb-16{margin-bottom:16px}
-.mt-12{margin-top:12px}
-.mt-16{margin-top:16px}
-.gap-8{gap:8px}
-.flex-wrap{flex-wrap:wrap}
-.flex{display:flex}
-.items-center{align-items:center}
-.justify-between{justify-content:space-between}
-.text-sm{font-size:13px}
-.text-xs{font-size:11px}
-.text-muted{color:var(--text3)}
-.w-full{width:100%}
-/* Scrollbar */
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:var(--bg2)}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--text3)}
-/* Help Center FAB */
-.help-fab{
-  position:fixed;bottom:24px;right:24px;z-index:9990;
-  width:54px;height:54px;border-radius:50%;border:none;cursor:pointer;
-  background:linear-gradient(135deg,var(--accent),var(--info));
-  color:#fff;font-size:22px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 6px 24px rgba(0,229,160,.35);
-  transition:all .3s cubic-bezier(.4,0,.2,1);
-  font-family:var(--font);
+html:not(.dark) .code-header { background: rgba(0,0,0,0.04); }
+
+.btn-copy {
+  background: none; border: none; color: var(--text-muted); cursor: pointer;
+  font-size: 0.78rem; padding: 2px 8px; border-radius: 4px; transition: var(--transition);
+  display: flex; align-items: center; gap: 4px;
 }
-.help-fab:hover{transform:scale(1.1) translateY(-2px);box-shadow:0 10px 32px rgba(0,229,160,.45)}
-.help-fab.active{
-  background:var(--card2);color:var(--text);border:1px solid var(--border);
-  box-shadow:var(--shadow);
+.btn-copy:hover { color: var(--accent); background: var(--accent-glow); }
+
+.msg-content pre code {
+  display: block; padding: 14px; overflow-x: auto; font-family: var(--font-code);
+  font-size: 0.85rem; line-height: 1.6;
 }
-.help-fab.active:hover{background:var(--border)}
-/* Help Panel */
-.help-panel{
-  position:fixed;bottom:92px;right:24px;z-index:9989;
-  width:380px;max-width:calc(100vw - 32px);max-height:70vh;
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--radius);box-shadow:0 16px 48px rgba(0,0,0,.4);
-  overflow:hidden;
-  transform:translateY(16px) scale(.96);opacity:0;
-  pointer-events:none;transition:all .3s cubic-bezier(.4,0,.2,1);
+.msg-content code:not(pre code) {
+  background: var(--bg-input); padding: 2px 6px; border-radius: 4px;
+  font-family: var(--font-code); font-size: 0.85em; color: var(--accent);
 }
-.help-panel.open{
-  transform:translateY(0) scale(1);opacity:1;pointer-events:auto;
+
+/* Typing indicator */
+.typing-indicator { display: flex; gap: 4px; padding: 8px 0; }
+.typing-indicator span {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  animation: typingBounce 1.4s infinite ease-in-out;
 }
-.help-header{
-  padding:16px 20px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:10px;
-  background:linear-gradient(135deg,rgba(0,229,160,.08),rgba(56,189,248,.06));
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+
+/* ===================== INPUT AREA ===================== */
+.input-area {
+  border-top: 1px solid var(--border); padding: 16px 28px; background: var(--bg-secondary);
 }
-.help-header i{color:var(--accent);font-size:18px}
-.help-header h3{font-size:15px;font-weight:600;flex:1}
-.help-header .help-close{
-  width:28px;height:28px;border-radius:50%;border:none;
-  background:var(--bg2);color:var(--text3);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:var(--transition);font-size:12px;
+.input-row { display: flex; gap: 10px; align-items: flex-end; }
+.input-wrapper {
+  flex: 1; position: relative;
 }
-.help-header .help-close:hover{background:var(--border);color:var(--text)}
-.help-body{padding:20px;overflow-y:auto;max-height:calc(70vh - 60px)}
-.help-section{margin-bottom:18px}
-.help-section:last-child{margin-bottom:0}
-.help-section-title{
-  font-size:13px;font-weight:600;color:var(--accent);
-  margin-bottom:8px;display:flex;align-items:center;gap:6px;
+.input-wrapper textarea {
+  width: 100%; min-height: 48px; max-height: 200px; padding: 12px 16px;
+  background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-primary); resize: none; font-size: 16px; line-height: 1.5;
+  transition: var(--transition);
 }
-.help-section-title i{font-size:11px}
-.help-step{
-  display:flex;gap:10px;margin-bottom:10px;
-  font-size:13px;line-height:1.5;color:var(--text2);
+.input-wrapper textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.input-wrapper textarea::placeholder { color: var(--text-muted); }
+
+.btn-send {
+  width: 48px; height: 48px; border-radius: var(--radius-sm); border: none;
+  background: var(--gradient-btn); color: #fff; cursor: pointer; font-size: 1.1rem;
+  transition: var(--transition); flex-shrink: 0; display: flex; align-items: center; justify-content: center;
 }
-.help-step:last-child{margin-bottom:0}
-.help-step-num{
-  flex-shrink:0;width:22px;height:22px;border-radius:50%;
-  background:var(--accent-glow);color:var(--accent);
-  font-size:11px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-  border:1px solid rgba(0,229,160,.25);margin-top:1px;
+.btn-send:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+.btn-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* ===================== QA FORM PANELS ===================== */
+.form-panel { display: flex; flex-direction: column; gap: 16px; }
+.form-group label {
+  display: block; font-family: var(--font-heading); font-size: 0.8rem;
+  color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 6px; font-weight: 600;
 }
-.help-step p{margin:0}
-.help-tip{
-  display:flex;gap:8px;padding:10px 12px;
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);margin-top:12px;
-  font-size:12px;line-height:1.5;color:var(--text2);
+.form-group textarea, .form-group input[type="text"], .form-group input[type="url"], .form-group select {
+  width: 100%; padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text-primary); font-size: 16px;
+  transition: var(--transition);
 }
-.help-tip i{color:var(--warn);flex-shrink:0;margin-top:2px}
-.help-nav{
-  display:flex;gap:4px;flex-wrap:wrap;padding:12px 20px;
-  border-top:1px solid var(--border);background:var(--bg2);
+.form-group textarea { min-height: 120px; resize: vertical; font-family: var(--font-body); line-height: 1.5; }
+.form-group textarea:focus, .form-group input:focus, .form-group select:focus {
+  outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow);
 }
-.help-nav-btn{
-  padding:5px 10px;border:1px solid var(--border);border-radius:14px;
-  background:none;color:var(--text3);font-size:11px;font-weight:500;
-  cursor:pointer;font-family:var(--font);transition:var(--transition);
-  white-space:nowrap;
+
+.form-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.output-panel {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden;
 }
-.help-nav-btn:hover{border-color:var(--accent);color:var(--accent)}
-.help-nav-btn.active{background:var(--accent-glow);border-color:var(--accent);color:var(--accent)}
-@media(max-width:640px){
-  .help-fab{width:48px;height:48px;font-size:18px;bottom:16px;right:16px}
-  .help-panel{bottom:76px;right:16px;max-height:60vh}
+.output-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--bg-input);
 }
+.output-header-title { font-family: var(--font-heading); font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+.output-body { padding: 18px; font-size: 0.92rem; line-height: 1.7; min-height: 100px; overflow-x: auto; }
+.output-body.empty-state { color: var(--text-muted); text-align: center; padding: 40px 18px; font-style: italic; }
+
+/* ===================== DOWNLOAD BTN ===================== */
+.btn-download {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
+  background: var(--success); color: #fff; border: none; border-radius: var(--radius-sm);
+  font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: var(--transition);
+}
+.btn-download:hover { opacity: 0.85; }
+.btn-download:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ===================== TOAST ===================== */
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  padding: 12px 20px; border-radius: var(--radius-sm); font-size: 0.88rem; font-weight: 500;
+  animation: toastIn 0.3s ease-out; box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  display: flex; align-items: center; gap: 10px; max-width: 360px;
+}
+.toast.success { background: var(--success); color: #fff; }
+.toast.error { background: var(--error); color: #fff; }
+.toast.info { background: var(--accent); color: var(--bg-primary); }
+@keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ===================== MODAL ===================== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex;
+  align-items: center; justify-content: center; z-index: 9000; padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+.modal-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 28px; max-width: 440px; width: 100%; box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+}
+.modal-title { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; }
+.modal-text { color: var(--text-secondary); font-size: 0.92rem; margin-bottom: 20px; line-height: 1.5; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ===================== LOADING ===================== */
+.loading-bar {
+  height: 3px; background: var(--gradient); border-radius: 2px;
+  animation: loadingPulse 1.5s ease-in-out infinite;
+  position: absolute; top: 0; left: 0; right: 0;
+}
+@keyframes loadingPulse {
+  0% { opacity: 0.3; transform: scaleX(0.3); transform-origin: left; }
+  50% { opacity: 1; transform: scaleX(1); }
+  100% { opacity: 0.3; transform: scaleX(0.3); transform-origin: right; }
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed; top: var(--topbar-height); left: 0; bottom: 0;
+    z-index: 50; transform: translateX(-100%); width: 260px;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay {
+    position: fixed; inset: 0; top: var(--topbar-height); background: rgba(0,0,0,0.4);
+    z-index: 49; display: none;
+  }
+  .sidebar-overlay.open { display: block; }
+  .btn-menu { display: block; }
+  .content-body { padding: 16px; }
+  .input-area { padding: 12px 16px; }
+  .content-header { padding: 16px 16px 12px; }
+  .config-grid { grid-template-columns: 1fr; }
+}
+
+/* ===================== UTILS ===================== */
+.hidden { display: none !important; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.mt-auto { margin-top: auto; }
+.gap-sm { gap: 8px; }
+.w-full { width: 100%; }
+.text-accent { color: var(--accent); }
+.text-muted { color: var(--text-muted); }
+.text-sm { font-size: 0.85rem; }
+.fw-600 { font-weight: 600; }
+
+/* ===================== EMPTY STATE ===================== */
+.empty-hero { text-align: center; padding: 60px 20px; }
+.empty-hero i { font-size: 3rem; color: var(--text-muted); margin-bottom: 16px; }
+.empty-hero h3 { font-family: var(--font-heading); font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 8px; }
+.empty-hero p { color: var(--text-muted); font-size: 0.9rem; max-width: 400px; margin: 0 auto; }
+
+/* ===================== API Endpoint Builder ===================== */
+.endpoint-row {
+  display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;
+}
+.endpoint-method {
+  width: 110px; flex-shrink: 0;
+}
+.endpoint-url { flex: 1; min-width: 200px; }
+.params-list { display: flex; flex-direction: column; gap: 8px; }
+.param-row { display: flex; gap: 8px; align-items: center; }
+.param-row input { flex: 1; }
+.btn-remove-param {
+  background: none; border: none; color: var(--error); cursor: pointer;
+  font-size: 1rem; padding: 4px; transition: var(--transition);
+}
+.btn-add-param {
+  background: none; border: 1px dashed var(--border); color: var(--text-secondary);
+  padding: 8px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem;
+  transition: var(--transition); text-align: center;
+}
+.btn-add-param:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Quick action cards in QA */
+.quick-actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.quick-action {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 16px; cursor: pointer; transition: var(--transition); text-align: center;
+}
+.quick-action:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+.quick-action i { font-size: 1.5rem; color: var(--accent); margin-bottom: 8px; display: block; }
+.quick-action span { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+
+/* Version badge */
+.version-badge {
+  font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; font-weight: 700;
+  background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent);
+  letter-spacing: 1px; font-family: var(--font-code);
+}
+
+/* ===================== LOCAL MODE BANNER ===================== */
+.local-banner {
+  padding: 8px 16px; font-size: 0.82rem; font-weight: 600;
+  font-family: var(--font-heading);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2); flex-wrap: wrap;
+}
+.local-banner.connected {
+  background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff;
+}
+.local-banner.disconnected {
+  background: linear-gradient(135deg, #f59e0b, #d97706); color: #1a1a1a;
+}
+.local-banner i { font-size: 0.9rem; }
+.local-banner .banner-text { flex: 1; text-align: center; min-width: 200px; }
+.btn-banner {
+  background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.4);
+  color: inherit; padding: 4px 12px; border-radius: 6px; cursor: pointer;
+  font-size: 0.78rem; font-weight: 700; transition: 0.2s;
+  font-family: var(--font-heading); white-space: nowrap;
+}
+.btn-banner:hover { background: rgba(255,255,255,0.4); }
+body.local-mode .view { padding-top: 40px; }
+body.local-mode .topbar { top: 40px; }
+body.local-mode .sidebar { top: calc(var(--topbar-height) + 40px); }
+@media (max-width: 768px) {
+  body.local-mode .sidebar { top: calc(var(--topbar-height) + 40px); }
+  body.local-mode .sidebar-overlay { top: calc(var(--topbar-height) + 40px); }
+}
+
+/* ===================== API KEY MODAL ===================== */
+.api-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex;
+  align-items: center; justify-content: center; z-index: 10000; padding: 20px;
+  animation: fadeIn 0.3s ease-out; backdrop-filter: blur(4px);
+}
+.api-modal {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 32px; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: cardIn 0.4s ease-out;
+}
+.api-modal .modal-logo {
+  font-family: var(--font-display); font-size: 1.5rem; font-weight: 900;
+  background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; text-align: center; margin-bottom: 4px; letter-spacing: 4px;
+}
+.api-modal .modal-subtitle {
+  text-align: center; color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 24px;
+}
+.api-modal .key-input-group { position: relative; margin-bottom: 16px; }
+.api-modal .key-input {
+  width: 100%; padding: 14px 46px 14px 16px; background: var(--bg-input);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-primary); font-size: 16px; font-family: var(--font-code);
+  transition: 0.3s;
+}
+.api-modal .key-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.api-modal .key-toggle {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: var(--text-muted); cursor: pointer;
+  font-size: 1rem; padding: 4px;
+}
+.api-modal .key-toggle:hover { color: var(--text-primary); }
+.api-modal .key-help {
+  font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;
+}
+.api-modal .key-help code {
+  background: var(--bg-input); padding: 1px 6px; border-radius: 4px;
+  font-family: var(--font-code); font-size: 0.78rem; color: var(--accent);
+}
+.api-modal .modal-actions { display: flex; gap: 10px; }
+.api-modal .modal-actions button { flex: 1; }
 </style>
 </head>
 <body>
-<div class="app">
-  <!-- Header -->
-  <div class="header">
-    <div class="header-badge"><i class="fas fa-flask"></i> Ferramenta QA</div>
-    <h1><i class="fas fa-rocket"></i> API Payload Generator</h1>
-    <p>Geração automática de payloads JSON para testes de API &mdash; rápido, flexível e massivo.</p>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tabs" id="tabsBar">
-    <button class="tab-btn active" data-tab="generator"><i class="fas fa-cogs"></i> <span class="tab-text">Gerador</span></button>
-    <button class="tab-btn" data-tab="preview"><i class="fas fa-eye"></i> <span class="tab-text">Preview</span></button>
-    <button class="tab-btn" data-tab="import"><i class="fas fa-file-import"></i> <span class="tab-text">Importar</span></button>
-    <button class="tab-btn" data-tab="templates"><i class="fas fa-bookmark"></i> <span class="tab-text">Templates</span></button>
-    <button class="tab-btn" data-tab="loadtest"><i class="fas fa-bolt"></i> <span class="tab-text">Teste de Carga</span></button>
-    <button class="tab-btn" data-tab="report"><i class="fas fa-chart-bar"></i> <span class="tab-text">Relatório</span></button>
-  </div>
-
-  <!-- GENERATOR TAB -->
-  <div class="tab-panel active" id="panel-generator">
-    <!-- Config -->
-    <div class="card">
-      <div class="card-title"><i class="fas fa-sliders-h"></i> Configuração</div>
-      <div class="inline-row mb-12">
-        <div class="form-group">
-          <label for="numFields">Nº de Campos</label>
-          <input type="number" id="numFields" min="1" max="50" value="3" placeholder="Ex: 5">
-        </div>
-        <div class="form-group">
-          <label for="numRequests">Nº de Requisições</label>
-          <input type="number" id="numRequests" min="1" max="10000" value="10" placeholder="Ex: 100">
-        </div>
-        <div class="form-group" style="display:flex;align-items:end">
-          <button class="btn btn-primary" onclick="generateFields()"><i class="fas fa-plus-circle"></i> Gerar Campos</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Fields -->
-    <div class="card" id="fieldsCard" style="display:none">
-      <div class="card-title"><i class="fas fa-list-alt"></i> Campos do Payload</div>
-      <div id="fieldsContainer"></div>
-      <button class="btn btn-secondary btn-sm mt-12" onclick="addSingleField()"><i class="fas fa-plus"></i> Adicionar Campo</button>
-    </div>
-
-    <!-- Actions -->
-    <div class="card" id="actionsCard" style="display:none">
-      <div class="card-title"><i class="fas fa-play-circle"></i> Ações</div>
-      <div class="inline-row mb-12">
-        <div class="form-group">
-          <label>Formato de Exportação</label>
-          <select id="exportFormat">
-            <option value="json">JSON (Array)</option>
-            <option value="ndjson">NDJSON</option>
-            <option value="csv">CSV</option>
-            <option value="sql">SQL INSERT</option>
-            <option value="postman">Postman Collection</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Nome da Tabela (SQL)</label>
-          <input type="text" id="sqlTableName" value="api_test_data" placeholder="Nome da tabela">
-        </div>
-      </div>
-      <div class="flex gap-8 flex-wrap">
-        <button class="btn btn-primary" onclick="generatePayloads()"><i class="fas fa-cog fa-spin-on-active"></i> Gerar Payloads</button>
-        <button class="btn btn-secondary" onclick="previewPayloads()"><i class="fas fa-eye"></i> Preview</button>
-        <button class="btn btn-secondary" onclick="saveAsTemplate()"><i class="fas fa-bookmark"></i> Salvar Template</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PREVIEW TAB -->
-  <div class="tab-panel" id="panel-preview">
-    <div class="card">
-      <div class="card-title"><i class="fas fa-code"></i> Pré-visualização do Payload</div>
-      <div id="previewContent" class="json-preview">
-        <div class="empty-state"><i class="fas fa-search"></i><p>Configure os campos e clique em "Preview" para visualizar.</p></div>
-      </div>
-      <div class="mt-12 flex gap-8 flex-wrap">
-        <button class="btn btn-secondary btn-sm" onclick="copyPreview()"><i class="fas fa-copy"></i> Copiar</button>
-        <span class="text-xs text-muted mt-12" id="previewInfo"></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- IMPORT TAB -->
-  <div class="tab-panel" id="panel-import">
-    <div class="card">
-      <div class="card-title"><i class="fas fa-file-import"></i> Importar Template JSON</div>
-      <p class="text-sm text-muted mb-12">Cole um JSON modelo abaixo e o sistema interpretará os tipos automaticamente.</p>
-      <textarea id="importJson" placeholder='{"nome": "João", "cpf": "12345678909", "email": "test@mail.com", "idade": 25, "ativo": true}'></textarea>
-      <button class="btn btn-primary mt-12" onclick="importTemplate()"><i class="fas fa-magic"></i> Interpretar e Importar</button>
-    </div>
-  </div>
-
-  <!-- TEMPLATES TAB -->
-  <div class="tab-panel" id="panel-templates">
-    <div class="card">
-      <div class="card-title"><i class="fas fa-bookmark"></i> Templates Salvos</div>
-      <p class="text-xs text-muted mb-12">Templates ficam armazenados na sessão atual. Ao recarregar a página, serão perdidos.</p>
-      <div id="templatesList">
-        <div class="empty-state"><i class="fas fa-folder-open"></i><p>Nenhum template salvo ainda.</p></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- LOAD TEST TAB -->
-  <div class="tab-panel" id="panel-loadtest">
-    <div class="card">
-      <div class="card-title"><i class="fas fa-bolt"></i> Teste de Carga em API</div>
-      <p class="text-xs text-muted mb-12">Envie os payloads gerados diretamente para um endpoint. A API destino deve suportar CORS.</p>
-      <div class="inline-row mb-12">
-        <div class="form-group" style="flex:2">
-          <label for="apiUrl">URL da API</label>
-          <input type="url" id="apiUrl" placeholder="https://api.exemplo.com/endpoint">
-        </div>
-        <div class="form-group">
-          <label for="httpMethod">Método HTTP</label>
-          <select id="httpMethod">
-            <option value="POST">POST</option>
-            <option value="PUT">PUT</option>
-            <option value="PATCH">PATCH</option>
-          </select>
-        </div>
-      </div>
-      <div class="inline-row mb-12">
-        <div class="form-group">
-          <label for="ltRequests">Requisições</label>
-          <input type="number" id="ltRequests" min="1" max="1000" value="10">
-        </div>
-        <div class="form-group">
-          <label for="ltConcurrency">Concorrência</label>
-          <input type="number" id="ltConcurrency" min="1" max="50" value="5">
-        </div>
-      </div>
-      <div class="card" style="background:var(--bg2);padding:12px;margin-bottom:12px">
-        <label style="margin-bottom:8px;display:block">Headers Customizados (JSON)</label>
-        <textarea id="customHeaders" style="min-height:60px" placeholder='{"Authorization": "Bearer token123", "X-Custom": "value"}'></textarea>
-      </div>
-      <button class="btn btn-primary" id="btnLoadTest" onclick="startLoadTest()"><i class="fas fa-play"></i> Iniciar Teste</button>
-      <button class="btn btn-danger hidden" id="btnStopTest" onclick="stopLoadTest()"><i class="fas fa-stop"></i> Parar</button>
-      <div class="progress-bar mt-12 hidden" id="ltProgress"><div class="fill" id="ltProgressFill"></div></div>
-      <p class="text-xs text-muted mt-12" id="ltStatus"></p>
-    </div>
-  </div>
-
-  <!-- REPORT TAB -->
-  <div class="tab-panel" id="panel-report">
-    <div class="card">
-      <div class="card-title"><i class="fas fa-chart-bar"></i> Relatório de Execução</div>
-      <div id="reportContent">
-        <div class="empty-state"><i class="fas fa-clipboard-list"></i><p>Execute um teste de carga para ver o relatório.</p></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Help FAB -->
-<button class="help-fab" id="helpFab" onclick="toggleHelp()" title="Central de Ajuda">?</button>
-
-<!-- Help Panel -->
-<div class="help-panel" id="helpPanel">
-  <div class="help-header">
-    <i class="fas fa-life-ring"></i>
-    <h3>Central de Ajuda</h3>
-    <button class="help-close" onclick="toggleHelp()"><i class="fas fa-times"></i></button>
-  </div>
-  <div class="help-nav" id="helpNav"></div>
-  <div class="help-body" id="helpBody"></div>
-</div>
-
-<!-- Toast container -->
+<div class="grid-bg"></div>
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- ==================== LANDING ==================== -->
+<div id="landing" class="view active">
+  <div class="landing-content">
+    <div class="brand">NEXUS</div>
+    <div class="brand-sub">Plataforma de Inteligência Dev & QA</div>
+    <div class="role-cards">
+      <div class="role-card" onclick="selectRole('dev')">
+        <div class="role-icon"><i class="fas fa-code"></i></div>
+        <div class="role-title">Desenvolvedor</div>
+        <div class="role-desc">Configure seu stack tecnológico e tenha um assistente IA especializado no seu contexto.</div>
+        <ul class="role-features">
+          <li>Assistente de código contextual</li>
+          <li>Geração de boilerplate e CRUD</li>
+          <li>Debug inteligente com IA</li>
+          <li>Recomendações de arquitetura</li>
+          <li>Boas práticas e code review</li>
+        </ul>
+      </div>
+      <div class="role-card" onclick="selectRole('qa')">
+        <div class="role-icon"><i class="fas fa-flask-vial"></i></div>
+        <div class="role-title">Quality Assurance</div>
+        <div class="role-desc">Gere casos de teste, collections do Postman, scripts automatizados e muito mais.</div>
+        <ul class="role-features">
+          <li>Gerador de casos de teste</li>
+          <li>Postman Collection Builder</li>
+          <li>Scripts de teste automatizado</li>
+          <li>Assistente de bug reports</li>
+          <li>Gerador de planos de teste</li>
+        </ul>
+      </div>
+    </div>
+    <div class="text-muted text-sm" style="margin-top:8px;">Powered by IA — Respostas via Claude Sonnet</div>
+  </div>
+</div>
+
+<!-- ==================== DEV WORKSPACE ==================== -->
+<div id="devWorkspace" class="view">
+  <div class="topbar">
+    <button class="btn-menu" onclick="toggleSidebar('dev')"><i class="fas fa-bars"></i></button>
+    <div class="topbar-brand">NEXUS</div>
+    <div class="topbar-sep"></div>
+    <div class="topbar-role"><i class="fas fa-code"></i> Desenvolvedor</div>
+    <span class="version-badge">v1.0</span>
+    <div class="topbar-spacer"></div>
+    <button class="btn-back" onclick="goBack()"><i class="fas fa-arrow-left"></i> Voltar</button>
+  </div>
+  <div class="workspace-body">
+    <div class="sidebar-overlay" id="devSidebarOverlay" onclick="toggleSidebar('dev')"></div>
+    <aside class="sidebar" id="devSidebar">
+      <div class="sidebar-title">Ferramentas</div>
+      <button class="sidebar-item active" data-tool="dev-config" onclick="selectDevTool(this, 'dev-config')">
+        <i class="fas fa-sliders"></i> Stack Config
+      </button>
+      <button class="sidebar-item" data-tool="dev-assistant" onclick="selectDevTool(this, 'dev-assistant')">
+        <i class="fas fa-robot"></i> Assistente IA
+      </button>
+      <button class="sidebar-item" data-tool="dev-architecture" onclick="selectDevTool(this, 'dev-architecture')">
+        <i class="fas fa-sitemap"></i> Arquitetura
+      </button>
+      <button class="sidebar-item" data-tool="dev-debug" onclick="selectDevTool(this, 'dev-debug')">
+        <i class="fas fa-bug"></i> Debug Helper
+      </button>
+      <button class="sidebar-item" data-tool="dev-codegen" onclick="selectDevTool(this, 'dev-codegen')">
+        <i class="fas fa-wand-magic-sparkles"></i> Code Generator
+      </button>
+      <button class="sidebar-item" data-tool="dev-review" onclick="selectDevTool(this, 'dev-review')">
+        <i class="fas fa-magnifying-glass-chart"></i> Code Review
+      </button>
+      <div class="sidebar-title" style="margin-top: 12px;">Utilidades</div>
+      <button class="sidebar-item" data-tool="dev-json" onclick="selectDevTool(this, 'dev-json')">
+        <i class="fas fa-brackets-curly"></i> JSON Formatter
+      </button>
+      <button class="sidebar-item" data-tool="dev-http" onclick="selectDevTool(this, 'dev-http')">
+        <i class="fas fa-globe"></i> HTTP Reference
+      </button>
+    </aside>
+    <div class="main-content" id="devMainContent">
+      <!-- Dynamic content injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ==================== QA WORKSPACE ==================== -->
+<div id="qaWorkspace" class="view">
+  <div class="topbar">
+    <button class="btn-menu" onclick="toggleSidebar('qa')"><i class="fas fa-bars"></i></button>
+    <div class="topbar-brand">NEXUS</div>
+    <div class="topbar-sep"></div>
+    <div class="topbar-role"><i class="fas fa-flask-vial"></i> Quality Assurance</div>
+    <span class="version-badge">v1.0</span>
+    <div class="topbar-spacer"></div>
+    <button class="btn-back" onclick="goBack()"><i class="fas fa-arrow-left"></i> Voltar</button>
+  </div>
+  <div class="workspace-body">
+    <div class="sidebar-overlay" id="qaSidebarOverlay" onclick="toggleSidebar('qa')"></div>
+    <aside class="sidebar" id="qaSidebar">
+      <div class="sidebar-title">Ferramentas QA</div>
+      <button class="sidebar-item active" data-tool="qa-testcases" onclick="selectQATool(this, 'qa-testcases')">
+        <i class="fas fa-list-check"></i> Casos de Teste
+      </button>
+      <button class="sidebar-item" data-tool="qa-postman" onclick="selectQATool(this, 'qa-postman')">
+        <i class="fas fa-paper-plane"></i> Postman Collection
+      </button>
+      <button class="sidebar-item" data-tool="qa-scripts" onclick="selectQATool(this, 'qa-scripts')">
+        <i class="fas fa-terminal"></i> Scripts de Teste
+      </button>
+      <button class="sidebar-item" data-tool="qa-bugreport" onclick="selectQATool(this, 'qa-bugreport')">
+        <i class="fas fa-bug"></i> Bug Report
+      </button>
+      <button class="sidebar-item" data-tool="qa-testplan" onclick="selectQATool(this, 'qa-testplan')">
+        <i class="fas fa-clipboard-list"></i> Plano de Teste
+      </button>
+      <button class="sidebar-item" data-tool="qa-performance" onclick="selectQATool(this, 'qa-performance')">
+        <i class="fas fa-gauge-high"></i> Performance
+      </button>
+      <div class="sidebar-title" style="margin-top: 12px;">Utilidades</div>
+      <button class="sidebar-item" data-tool="qa-json" onclick="selectQATool(this, 'qa-json')">
+        <i class="fas fa-brackets-curly"></i> JSON Formatter
+      </button>
+      <button class="sidebar-item" data-tool="qa-http" onclick="selectQATool(this, 'qa-http')">
+        <i class="fas fa-globe"></i> HTTP Reference
+      </button>
+    </aside>
+    <div class="main-content" id="qaMainContent">
+      <!-- Dynamic content injected by JS -->
+    </div>
+  </div>
+</div>
+
 <script>
-/* ============================================================
-   STATE
-   ============================================================ */
-let fields = [];
-let generatedPayloads = [];
-let savedTemplates = [];
-let loadTestAbort = null;
+/* ======================================================
+   NEXUS — Dev & QA Intelligence Platform
+   ====================================================== */
 
-/* ============================================================
-   DARK / LIGHT MODE
-   ============================================================ */
-(function initTheme() {
-  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-    document.documentElement.classList.add('light');
-  }
-  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function(e) {
-    if (e.matches) {
-      document.documentElement.classList.add('light');
-    } else {
-      document.documentElement.classList.remove('light');
+// ============================================================
+// LOCAL API SYSTEM — Real Poe API calls when outside Poe iframe
+// ============================================================
+const IS_POE_ENV = !!(window.Poe && typeof window.Poe.sendUserMessage === 'function');
+
+// API state
+let poeApiKey = '';
+let isApiConnected = false;
+
+if (!IS_POE_ENV) {
+  document.body.classList.add('local-mode');
+
+  // Handler registry (used by both API and mock mode)
+  const localHandlers = {};
+
+  // ---- Banner ----
+  function createBanner() {
+    let banner = document.getElementById('localBanner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'localBanner';
+      document.body.prepend(banner);
     }
-  });
-})();
+    if (isApiConnected) {
+      banner.className = 'local-banner connected';
+      banner.innerHTML =
+        '<i class="fas fa-plug-circle-check"></i>' +
+        '<span class="banner-text">MODO LOCAL — Conectado à API Poe (respostas reais via IA)</span>' +
+        '<button class="btn-banner" onclick="openApiKeyModal()"><i class="fas fa-gear"></i> Config</button>';
+    } else {
+      banner.className = 'local-banner disconnected';
+      banner.innerHTML =
+        '<i class="fas fa-plug-circle-xmark"></i>' +
+        '<span class="banner-text">MODO LOCAL — Configure sua API Key para respostas reais</span>' +
+        '<button class="btn-banner" onclick="openApiKeyModal()"><i class="fas fa-key"></i> Configurar API Key</button>';
+    }
+  }
 
-/* ============================================================
-   TABS
-   ============================================================ */
-document.querySelectorAll('.tab-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
-    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
-    btn.classList.add('active');
-    var panel = document.getElementById('panel-' + btn.dataset.tab);
-    if (panel) panel.classList.add('active');
-  });
+  // ---- API Key Modal ----
+  window.openApiKeyModal = function() {
+    // Remove existing modal if any
+    const existing = document.getElementById('apiKeyModalOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'apiKeyModalOverlay';
+    overlay.className = 'api-modal-overlay';
+    overlay.innerHTML =
+      '<div class="api-modal">' +
+        '<div class="modal-logo">NEXUS</div>' +
+        '<div class="modal-subtitle">Configurar conexão com a API do Poe</div>' +
+        '<div class="key-input-group">' +
+          '<input type="password" class="key-input" id="apiKeyInput" placeholder="Cole sua API Key aqui..." value="' + (poeApiKey || '') + '">' +
+          '<button class="key-toggle" onclick="toggleKeyVisibility()" title="Mostrar/ocultar"><i class="fas fa-eye"></i></button>' +
+        '</div>' +
+        '<div class="key-help">' +
+          'Obtenha sua key em <code>poe.com/api_key</code><br>' +
+          'Endpoint: <code>api.poe.com/v1/chat/completions</code><br>' +
+          'A key fica apenas na memória, não é salva em disco.' +
+        '</div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn-secondary" onclick="closeApiKeyModal()">Cancelar</button>' +
+          '<button class="btn-primary" onclick="saveApiKey()"><i class="fas fa-plug"></i> Conectar</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeApiKeyModal(); });
+    setTimeout(function() { document.getElementById('apiKeyInput').focus(); }, 100);
+  };
+
+  window.closeApiKeyModal = function() {
+    const m = document.getElementById('apiKeyModalOverlay');
+    if (m) m.remove();
+  };
+
+  window.toggleKeyVisibility = function() {
+    const input = document.getElementById('apiKeyInput');
+    const icon = input.nextElementSibling.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'fas fa-eye-slash';
+    } else {
+      input.type = 'password';
+      icon.className = 'fas fa-eye';
+    }
+  };
+
+  window.saveApiKey = function() {
+    const key = document.getElementById('apiKeyInput').value.trim();
+    if (!key) {
+      poeApiKey = '';
+      isApiConnected = false;
+      createBanner();
+      closeApiKeyModal();
+      showToast('API Key removida — modo desconectado', 'info');
+      return;
+    }
+    poeApiKey = key;
+    isApiConnected = true;
+    createBanner();
+    closeApiKeyModal();
+    showToast('API Key configurada! Respostas reais ativas.', 'success');
+  };
+
+  // ---- Parse bot mention from sendUserMessage text ----
+  function parseBotMessage(text) {
+    const match = text.match(/^@([\w.\-]+)\s+([\s\S]*)$/);
+    if (match) return { model: match[1], prompt: match[2] };
+    return { model: 'Claude-Sonnet-4.5', prompt: text };
+  }
+
+  // ---- Call Poe API with SSE streaming ----
+  async function callPoeAPIStream(model, prompt, handlerName, handlerContext) {
+    const handler = localHandlers[handlerName];
+    if (!handler) return;
+
+    const msgId = 'api-msg-' + Date.now();
+
+    try {
+      const response = await fetch('https://api.poe.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + poeApiKey
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [{ role: 'user', content: prompt }],
+          stream: true
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text().catch(function() { return 'Erro desconhecido'; });
+        let errMsg = 'HTTP ' + response.status;
+        try {
+          const errJSON = JSON.parse(errText);
+          errMsg = errJSON.error && errJSON.error.message ? errJSON.error.message : errMsg;
+        } catch(e) {
+          errMsg = errText.substring(0, 200) || errMsg;
+        }
+        handler({
+          status: 'complete',
+          responses: [{
+            messageId: msgId, senderId: model,
+            content: '', contentType: 'text/markdown',
+            status: 'error', statusText: errMsg, attachments: []
+          }]
+        }, handlerContext || {});
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullContent = '';
+      let buffer = '';
+
+      while (true) {
+        var readResult = await reader.read();
+        if (readResult.done) break;
+
+        buffer += decoder.decode(readResult.value, { stream: true });
+        var lines = buffer.split('\n');
+        // Keep the last potentially incomplete line in the buffer
+        buffer = lines.pop() || '';
+
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i].trim();
+          if (!line.startsWith('data: ')) continue;
+          var dataStr = line.substring(6);
+          if (dataStr === '[DONE]') continue;
+
+          try {
+            var parsed = JSON.parse(dataStr);
+            var delta = '';
+            if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta) {
+              delta = parsed.choices[0].delta.content || '';
+            }
+            if (delta) {
+              fullContent += delta;
+              handler({
+                status: 'incomplete',
+                responses: [{
+                  messageId: msgId, senderId: model,
+                  content: fullContent, contentType: 'text/markdown',
+                  status: 'incomplete', attachments: []
+                }]
+              }, handlerContext || {});
+            }
+          } catch(e) { /* skip unparseable chunks */ }
+        }
+      }
+
+      // Final complete callback
+      handler({
+        status: 'complete',
+        responses: [{
+          messageId: msgId, senderId: model,
+          content: fullContent, contentType: 'text/markdown',
+          status: 'complete', attachments: []
+        }]
+      }, handlerContext || {});
+
+    } catch (err) {
+      handler({
+        status: 'complete',
+        responses: [{
+          messageId: msgId, senderId: model,
+          content: '', contentType: 'text/markdown',
+          status: 'error',
+          statusText: 'Erro de conexão: ' + (err.message || String(err)),
+          attachments: []
+        }]
+      }, handlerContext || {});
+    }
+  }
+
+  // ---- Create mock window.Poe that routes to real API ----
+  window.Poe = {
+    registerHandler: function(name, func) {
+      localHandlers[name] = func;
+    },
+
+    sendUserMessage: function(text, options) {
+      var opts = options || {};
+      var handlerName = opts.handler;
+      var parsed = parseBotMessage(text);
+
+      if (!isApiConnected || !poeApiKey) {
+        // No API key — show modal and reject
+        return new Promise(function(resolve, reject) {
+          openApiKeyModal();
+          showToast('Configure sua API Key para continuar', 'error');
+          // Send error to handler so UI recovers
+          if (handlerName && localHandlers[handlerName]) {
+            localHandlers[handlerName]({
+              status: 'complete',
+              responses: [{
+                messageId: 'err-' + Date.now(), senderId: parsed.model,
+                content: '', contentType: 'text/markdown',
+                status: 'error',
+                statusText: 'API Key não configurada. Clique em "Configurar API Key" no banner acima.',
+                attachments: []
+              }]
+            }, opts.handlerContext || {});
+          }
+          resolve({ success: false });
+        });
+      }
+
+      // Fire API call in background, return immediately
+      if (handlerName) {
+        callPoeAPIStream(parsed.model, parsed.prompt, handlerName, opts.handlerContext);
+      }
+      return Promise.resolve({ success: true });
+    },
+
+    getTriggerMessage: function() {
+      return Promise.resolve({
+        messageId: 'local-trigger', senderId: 'User',
+        content: '', contentType: 'text/plain',
+        status: 'complete', attachments: []
+      });
+    }
+  };
+
+  // Show banner and modal on first load
+  createBanner();
+  setTimeout(function() { openApiKeyModal(); }, 600);
+
+  console.log('[NEXUS] Modo local ativo — API Poe via fetch.');
+}
+// ============================================================
+// END LOCAL API SYSTEM
+// ============================================================
+
+// ---- Dark mode detection ----
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  document.documentElement.classList.add('dark');
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+  if (event.matches) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
 });
 
-function switchTab(tabName) {
-  document.querySelectorAll('.tab-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.tab === tabName);
-  });
-  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
-  var panel = document.getElementById('panel-' + tabName);
-  if (panel) panel.classList.add('active');
+// ---- Marked.js config ----
+marked.setOptions({
+  highlight: function(code, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try { return hljs.highlight(code, { language: lang }).value; } catch(e) { /* ignore */ }
+    }
+    try { return hljs.highlightAuto(code).value; } catch(e) { /* ignore */ }
+    return code;
+  },
+  breaks: true,
+  gfm: true
+});
+
+// ---- State ----
+const state = {
+  role: null,
+  devStack: {
+    language: '',
+    framework: '',
+    database: '',
+    architecture: '',
+    tools: [],
+    projectName: ''
+  },
+  devTool: 'dev-config',
+  qaTool: 'qa-testcases',
+  chatHistory: [],
+  isLoading: false
+};
+
+// ---- Navigation ----
+function showView(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
 }
 
-/* ============================================================
-   TOAST
-   ============================================================ */
-function showToast(msg, type) {
-  type = type || 'info';
-  var icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
-  var el = document.createElement('div');
-  el.className = 'toast ' + type;
-  el.innerHTML = '<i class="fas ' + (icons[type] || icons.info) + '"></i> ' + msg;
-  document.getElementById('toastContainer').appendChild(el);
-  setTimeout(function() { el.style.opacity = '0'; el.style.transform = 'translateX(40px)'; setTimeout(function() { el.remove(); }, 300); }, 3000);
-}
-
-/* ============================================================
-   MODAL (replaces confirm/prompt)
-   ============================================================ */
-function showModal(title, message, onConfirm, opts) {
-  opts = opts || {};
-  var overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  var hasInput = !!opts.input;
-  overlay.innerHTML =
-    '<div class="modal">' +
-    '<h3>' + title + '</h3>' +
-    '<p>' + message + '</p>' +
-    (hasInput ? '<input type="text" id="modalInput" value="' + (opts.inputValue || '') + '" placeholder="' + (opts.inputPlaceholder || '') + '" style="margin-bottom:16px">' : '') +
-    '<div class="modal-actions">' +
-    '<button class="btn btn-secondary btn-sm" id="modalCancel">Cancelar</button>' +
-    '<button class="btn btn-primary btn-sm" id="modalConfirm">' + (opts.confirmText || 'Confirmar') + '</button>' +
-    '</div></div>';
-  document.body.appendChild(overlay);
-  overlay.querySelector('#modalCancel').onclick = function() { overlay.remove(); };
-  overlay.querySelector('#modalConfirm').onclick = function() {
-    var val = hasInput ? overlay.querySelector('#modalInput').value : true;
-    overlay.remove();
-    if (onConfirm) onConfirm(val);
-  };
-  if (hasInput) {
-    setTimeout(function() { overlay.querySelector('#modalInput').focus(); }, 100);
-  }
-}
-
-/* ============================================================
-   DATA TYPES
-   ============================================================ */
-var DATA_TYPES = [
-  { value: 'string', label: 'String Aleatória', icon: 'fa-font' },
-  { value: 'int', label: 'Inteiro', icon: 'fa-hashtag' },
-  { value: 'decimal', label: 'Decimal', icon: 'fa-percentage' },
-  { value: 'boolean', label: 'Booleano', icon: 'fa-toggle-on' },
-  { value: 'cpf', label: 'CPF Válido', icon: 'fa-id-card' },
-  { value: 'cnpj', label: 'CNPJ Válido', icon: 'fa-building' },
-  { value: 'email', label: 'Email', icon: 'fa-envelope' },
-  { value: 'telefone', label: 'Telefone', icon: 'fa-phone' },
-  { value: 'cep', label: 'CEP', icon: 'fa-map-pin' },
-  { value: 'date', label: 'Data (DD/MM/YYYY)', icon: 'fa-calendar' },
-  { value: 'timestamp', label: 'Timestamp ISO', icon: 'fa-clock' },
-  { value: 'uuid', label: 'UUID', icon: 'fa-fingerprint' },
-  { value: 'enum', label: 'Enum (valores fixos)', icon: 'fa-list' },
-  { value: 'null', label: 'Nulo', icon: 'fa-ban' }
-];
-
-/* ============================================================
-   DATA GENERATORS
-   ============================================================ */
-function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-function randChar() { var c = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; return c[randInt(0, c.length - 1)]; }
-function randString(min, max) { var len = randInt(min, max); var s = ''; for (var i = 0; i < len; i++) s += randChar(); return s; }
-
-function generateCPF(valid) {
-  var d = [];
-  var i, sum, r;
-  for (i = 0; i < 9; i++) d.push(randInt(0, 9));
-  sum = 0;
-  for (i = 0; i < 9; i++) sum += d[i] * (10 - i);
-  r = sum % 11;
-  d.push(r < 2 ? 0 : 11 - r);
-  sum = 0;
-  for (i = 0; i < 10; i++) sum += d[i] * (11 - i);
-  r = sum % 11;
-  d.push(r < 2 ? 0 : 11 - r);
-  if (!valid) { d[9] = (d[9] + randInt(1, 9)) % 10; }
-  return d.join('');
-}
-
-function generateCNPJ(valid) {
-  var d = [];
-  var i, sum, r;
-  for (i = 0; i < 8; i++) d.push(randInt(0, 9));
-  d.push(0, 0, 0, 1);
-  var w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-  sum = 0;
-  for (i = 0; i < 12; i++) sum += d[i] * w1[i];
-  r = sum % 11;
-  d.push(r < 2 ? 0 : 11 - r);
-  var w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-  sum = 0;
-  for (i = 0; i < 13; i++) sum += d[i] * w2[i];
-  r = sum % 11;
-  d.push(r < 2 ? 0 : 11 - r);
-  if (!valid) { d[12] = (d[12] + randInt(1, 9)) % 10; }
-  return d.join('');
-}
-
-function generateEmail(valid) {
-  var names = ['joao', 'maria', 'pedro', 'ana', 'lucas', 'julia', 'carlos', 'fernanda', 'rafael', 'camila'];
-  var domains = ['gmail.com', 'outlook.com', 'yahoo.com', 'empresa.com.br', 'teste.io'];
-  var name = names[randInt(0, names.length - 1)] + randInt(1, 999);
-  if (!valid) {
-    var badOpts = ['missing-at.com', 'user@', '@domain.com', 'user@@domain.com', 'user@.com'];
-    return badOpts[randInt(0, badOpts.length - 1)];
-  }
-  return name + '@' + domains[randInt(0, domains.length - 1)];
-}
-
-function generatePhone() {
-  return '(' + randInt(11, 99) + ') 9' + randInt(1000, 9999) + '-' + randInt(1000, 9999);
-}
-
-function generateCEP() {
-  return String(randInt(10000, 99999)) + '-' + String(randInt(100, 999));
-}
-
-function generateDate(minDate, maxDate) {
-  var min = minDate ? new Date(minDate).getTime() : new Date(1950, 0, 1).getTime();
-  var max = maxDate ? new Date(maxDate).getTime() : new Date(2025, 11, 31).getTime();
-  var d = new Date(randInt(min, max));
-  var dd = String(d.getDate()).padStart(2, '0');
-  var mm = String(d.getMonth() + 1).padStart(2, '0');
-  return dd + '/' + mm + '/' + d.getFullYear();
-}
-
-function generateTimestamp(minDate, maxDate) {
-  var min = minDate ? new Date(minDate).getTime() : new Date(2020, 0, 1).getTime();
-  var max = maxDate ? new Date(maxDate).getTime() : Date.now();
-  return new Date(randInt(min, max)).toISOString();
-}
-
-function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0;
-    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-  });
-}
-
-function generateValue(field) {
-  var t = field.type;
-  var inv = field.invalid;
-  var opts = field.options || {};
-
-  if (inv && Math.random() < 0.3) return null;
-
-  switch (t) {
-    case 'string':
-      if (inv) { return Math.random() < 0.5 ? '' : randString(500, 1000); }
-      return randString(opts.minLen || 5, opts.maxLen || 15);
-    case 'int':
-      if (inv) { return 'NaN_' + randString(3, 5); }
-      return randInt(opts.min != null ? Number(opts.min) : 0, opts.max != null ? Number(opts.max) : 10000);
-    case 'decimal':
-      if (inv) { return 'invalid_decimal'; }
-      var lo = opts.min != null ? Number(opts.min) : 0;
-      var hi = opts.max != null ? Number(opts.max) : 10000;
-      var prec = opts.precision != null ? Number(opts.precision) : 2;
-      return parseFloat((Math.random() * (hi - lo) + lo).toFixed(prec));
-    case 'boolean':
-      if (inv) { return 'maybe'; }
-      return Math.random() < 0.5;
-    case 'cpf':
-      return generateCPF(!inv);
-    case 'cnpj':
-      return generateCNPJ(!inv);
-    case 'email':
-      return generateEmail(!inv);
-    case 'telefone':
-      if (inv) { return '123'; }
-      return generatePhone();
-    case 'cep':
-      if (inv) { return 'ABCDE-FGH'; }
-      return generateCEP();
-    case 'date':
-      if (inv) { return '32/13/2025'; }
-      return generateDate(opts.minDate, opts.maxDate);
-    case 'timestamp':
-      if (inv) { return 'not-a-timestamp'; }
-      return generateTimestamp(opts.minDate, opts.maxDate);
-    case 'uuid':
-      if (inv) { return 'not-a-uuid'; }
-      return generateUUID();
-    case 'enum':
-      var vals = (opts.enumValues || 'A,B,C').split(',').map(function(v) { return v.trim(); }).filter(Boolean);
-      if (inv) { return 'INVALID_ENUM_' + randString(3, 5); }
-      return vals[randInt(0, vals.length - 1)];
-    case 'null':
-      return null;
-    default:
-      return randString(5, 10);
-  }
-}
-
-/* ============================================================
-   FIELD MANAGEMENT
-   ============================================================ */
-function generateFields() {
-  var n = parseInt(document.getElementById('numFields').value, 10);
-  if (!n || n < 1 || n > 50) {
-    document.getElementById('numFields').classList.add('error');
-    showToast('Informe entre 1 e 50 campos.', 'error');
-    return;
-  }
-  document.getElementById('numFields').classList.remove('error');
-  fields = [];
-  for (var i = 0; i < n; i++) {
-    fields.push({ name: '', type: 'string', invalid: false, options: {}, showOptions: false });
-  }
-  renderFields();
-  document.getElementById('fieldsCard').style.display = 'block';
-  document.getElementById('actionsCard').style.display = 'block';
-}
-
-function addSingleField() {
-  fields.push({ name: '', type: 'string', invalid: false, options: {}, showOptions: false });
-  renderFields();
-}
-
-function removeField(idx) {
-  fields.splice(idx, 1);
-  renderFields();
-}
-
-function renderFields() {
-  var container = document.getElementById('fieldsContainer');
-  container.innerHTML = '';
-  fields.forEach(function(f, idx) {
-    var typeOptions = DATA_TYPES.map(function(dt) {
-      return '<option value="' + dt.value + '"' + (f.type === dt.value ? ' selected' : '') + '>' + dt.label + '</option>';
-    }).join('');
-
-    var optsHtml = getOptionsHTML(f, idx);
-
-    var row = document.createElement('div');
-    row.className = 'field-row';
-    row.innerHTML =
-      '<div class="field-num">' + (idx + 1) + '</div>' +
-      '<div class="form-group"><label>Nome do Campo</label><input type="text" value="' + escHtml(f.name) + '" placeholder="ex: nome" onchange="updateFieldName(' + idx + ', this.value)" id="fname-' + idx + '"></div>' +
-      '<div class="form-group"><label>Tipo</label><select onchange="updateFieldType(' + idx + ', this.value)">' + typeOptions + '</select></div>' +
-      '<div class="field-actions">' +
-        '<div class="toggle-wrap"><div class="toggle' + (f.invalid ? ' on' : '') + '" onclick="toggleInvalid(' + idx + ')" title="Gerar dados inválidos"></div><span class="toggle-label">Inválido</span></div>' +
-        '<button class="btn-icon" onclick="toggleOptions(' + idx + ')" title="Opções"><i class="fas fa-sliders-h"></i></button>' +
-        '<button class="btn-icon delete" onclick="removeField(' + idx + ')" title="Remover"><i class="fas fa-trash"></i></button>' +
-      '</div>' +
-      '<div class="field-options' + (f.showOptions ? ' visible' : '') + '" id="fopts-' + idx + '">' + optsHtml + '</div>';
-    container.appendChild(row);
-  });
-}
-
-function getOptionsHTML(f, idx) {
-  var o = f.options || {};
-  switch (f.type) {
-    case 'string':
-      return '<div class="opts-grid">' +
-        '<div class="form-group"><label>Tamanho Mín.</label><input type="number" value="' + (o.minLen || 5) + '" onchange="updateOpt(' + idx + ',\'minLen\',this.value)" placeholder="5"></div>' +
-        '<div class="form-group"><label>Tamanho Máx.</label><input type="number" value="' + (o.maxLen || 15) + '" onchange="updateOpt(' + idx + ',\'maxLen\',this.value)" placeholder="15"></div>' +
-        '</div>';
-    case 'int':
-      return '<div class="opts-grid">' +
-        '<div class="form-group"><label>Valor Mín.</label><input type="number" value="' + (o.min != null ? o.min : 0) + '" onchange="updateOpt(' + idx + ',\'min\',this.value)" placeholder="0"></div>' +
-        '<div class="form-group"><label>Valor Máx.</label><input type="number" value="' + (o.max != null ? o.max : 10000) + '" onchange="updateOpt(' + idx + ',\'max\',this.value)" placeholder="10000"></div>' +
-        '</div>';
-    case 'decimal':
-      return '<div class="opts-grid">' +
-        '<div class="form-group"><label>Valor Mín.</label><input type="number" value="' + (o.min != null ? o.min : 0) + '" onchange="updateOpt(' + idx + ',\'min\',this.value)"></div>' +
-        '<div class="form-group"><label>Valor Máx.</label><input type="number" value="' + (o.max != null ? o.max : 10000) + '" onchange="updateOpt(' + idx + ',\'max\',this.value)"></div>' +
-        '<div class="form-group"><label>Casas Decimais</label><input type="number" value="' + (o.precision != null ? o.precision : 2) + '" onchange="updateOpt(' + idx + ',\'precision\',this.value)" min="0" max="10"></div>' +
-        '</div>';
-    case 'date':
-    case 'timestamp':
-      return '<div class="opts-grid">' +
-        '<div class="form-group"><label>Data Mín.</label><input type="date" value="' + (o.minDate || '') + '" onchange="updateOpt(' + idx + ',\'minDate\',this.value)"></div>' +
-        '<div class="form-group"><label>Data Máx.</label><input type="date" value="' + (o.maxDate || '') + '" onchange="updateOpt(' + idx + ',\'maxDate\',this.value)"></div>' +
-        '</div>';
-    case 'enum':
-      return '<div class="form-group"><label>Valores (separados por vírgula)</label><input type="text" value="' + escHtml(o.enumValues || 'ativo,inativo,pendente') + '" onchange="updateOpt(' + idx + ',\'enumValues\',this.value)" placeholder="valor1,valor2,valor3"></div>';
-    default:
-      return '<p class="text-xs text-muted">Sem opções adicionais para este tipo.</p>';
-  }
-}
-
-function updateFieldName(idx, val) { fields[idx].name = val; }
-function updateFieldType(idx, val) {
-  fields[idx].type = val;
-  fields[idx].options = {};
-  renderFields();
-}
-function updateOpt(idx, key, val) { fields[idx].options[key] = val; }
-function toggleInvalid(idx) {
-  fields[idx].invalid = !fields[idx].invalid;
-  renderFields();
-}
-function toggleOptions(idx) {
-  fields[idx].showOptions = !fields[idx].showOptions;
-  var el = document.getElementById('fopts-' + idx);
-  if (el) el.classList.toggle('visible');
-}
-
-function escHtml(str) {
-  var div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-/* ============================================================
-   VALIDATION
-   ============================================================ */
-function validateFields() {
-  var valid = true;
-  var numReq = parseInt(document.getElementById('numRequests').value, 10);
-  if (!numReq || numReq < 1) {
-    document.getElementById('numRequests').classList.add('error');
-    valid = false;
+function selectRole(role) {
+  state.role = role;
+  if (role === 'dev') {
+    showView('devWorkspace');
+    renderDevTool('dev-config');
   } else {
-    document.getElementById('numRequests').classList.remove('error');
+    showView('qaWorkspace');
+    renderQATool('qa-testcases');
   }
-  if (fields.length === 0) {
-    showToast('Configure os campos primeiro.', 'error');
-    return false;
+}
+
+function goBack() {
+  showConfirmDialog('Deseja voltar à tela inicial?', () => {
+    showView('landing');
+    state.role = null;
+  });
+}
+
+function toggleSidebar(role) {
+  const sidebar = document.getElementById(role === 'dev' ? 'devSidebar' : 'qaSidebar');
+  const overlay = document.getElementById(role === 'dev' ? 'devSidebarOverlay' : 'qaSidebarOverlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('open');
+}
+
+function closeSidebar(role) {
+  const sidebar = document.getElementById(role === 'dev' ? 'devSidebar' : 'qaSidebar');
+  const overlay = document.getElementById(role === 'dev' ? 'devSidebarOverlay' : 'qaSidebarOverlay');
+  sidebar.classList.remove('open');
+  overlay.classList.remove('open');
+}
+
+// ---- Toast ----
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+  toast.innerHTML = '<i class="fas ' + icon + '"></i> ' + message;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(40px)'; setTimeout(() => toast.remove(), 300); }, 3500);
+}
+
+// ---- Custom Dialogs ----
+function showConfirmDialog(message, onConfirm) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML =
+    '<div class="modal-box">' +
+      '<div class="modal-title">Confirmação</div>' +
+      '<div class="modal-text">' + message + '</div>' +
+      '<div class="modal-actions">' +
+        '<button class="btn-secondary modal-cancel">Cancelar</button>' +
+        '<button class="btn-primary modal-confirm">Confirmar</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('.modal-cancel').addEventListener('click', function() { overlay.remove(); });
+  overlay.querySelector('.modal-confirm').addEventListener('click', function() { overlay.remove(); onConfirm(); });
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+}
+
+function showAlertDialog(title, message) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML =
+    '<div class="modal-box">' +
+      '<div class="modal-title">' + title + '</div>' +
+      '<div class="modal-text">' + message + '</div>' +
+      '<div class="modal-actions">' +
+        '<button class="btn-primary modal-ok">OK</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('.modal-ok').addEventListener('click', function() { overlay.remove(); });
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+}
+
+// ---- Framework options based on language ----
+const frameworkMap = {
+  'JavaScript': ['React', 'Vue.js', 'Angular', 'Next.js', 'Nuxt.js', 'Express.js', 'NestJS', 'Svelte'],
+  'TypeScript': ['React + TS', 'Angular', 'Next.js', 'NestJS', 'Svelte', 'Fastify', 'tRPC'],
+  'Python': ['Django', 'Flask', 'FastAPI', 'Tornado', 'Pyramid', 'Streamlit'],
+  'Java': ['Spring Boot', 'Quarkus', 'Micronaut', 'Jakarta EE', 'Vert.x'],
+  'C#': ['.NET Core', 'ASP.NET MVC', 'Blazor', 'MAUI', 'Minimal APIs'],
+  'Go': ['Gin', 'Echo', 'Fiber', 'Chi', 'Gorilla Mux'],
+  'Rust': ['Actix Web', 'Rocket', 'Axum', 'Warp', 'Tide'],
+  'PHP': ['Laravel', 'Symfony', 'CodeIgniter', 'Slim', 'Yii'],
+  'Ruby': ['Ruby on Rails', 'Sinatra', 'Hanami', 'Grape'],
+  'Kotlin': ['Ktor', 'Spring Boot', 'Exposed', 'Vert.x'],
+  'Swift': ['Vapor', 'Kitura', 'Perfect', 'SwiftUI'],
+  'Dart': ['Flutter', 'Shelf', 'Aqueduct']
+};
+
+const databases = ['PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'SQLite', 'SQL Server', 'Oracle', 'DynamoDB', 'Cassandra', 'Elasticsearch', 'Firebase', 'Supabase'];
+const architectures = ['MVC', 'Microservices', 'Monolith', 'Serverless', 'Event-Driven', 'Hexagonal', 'Clean Architecture', 'CQRS', 'Domain-Driven Design'];
+const toolOptions = ['Docker', 'Kubernetes', 'CI/CD', 'Git', 'Terraform', 'AWS', 'GCP', 'Azure', 'Nginx', 'RabbitMQ', 'Kafka', 'GraphQL', 'REST', 'gRPC', 'WebSocket'];
+
+// ---- Dev Tool Rendering ----
+function selectDevTool(btn, tool) {
+  document.querySelectorAll('#devSidebar .sidebar-item').forEach(i => i.classList.remove('active'));
+  btn.classList.add('active');
+  state.devTool = tool;
+  renderDevTool(tool);
+  closeSidebar('dev');
+}
+
+function renderDevTool(tool) {
+  const main = document.getElementById('devMainContent');
+  switch(tool) {
+    case 'dev-config': renderDevConfig(main); break;
+    case 'dev-assistant': renderDevChat(main, 'Assistente IA', 'Pergunte qualquer coisa sobre desenvolvimento. A IA tem contexto do seu stack.', 'assistant'); break;
+    case 'dev-architecture': renderDevChat(main, 'Arquitetura', 'Consulte sobre padrões de arquitetura, design patterns e estrutura do projeto.', 'architecture'); break;
+    case 'dev-debug': renderDevChat(main, 'Debug Helper', 'Cole mensagens de erro, stack traces ou descreva o bug para obter ajuda.', 'debug'); break;
+    case 'dev-codegen': renderDevChat(main, 'Code Generator', 'Descreva o que precisa e receba código pronto no seu stack configurado.', 'codegen'); break;
+    case 'dev-review': renderDevChat(main, 'Code Review', 'Cole seu código para receber análise de qualidade, performance e boas práticas.', 'review'); break;
+    case 'dev-json': renderJSONFormatter(main); break;
+    case 'dev-http': renderHTTPReference(main); break;
+    default: break;
   }
-  fields.forEach(function(f, i) {
-    var inp = document.getElementById('fname-' + i);
-    if (!f.name || !f.name.trim()) {
-      if (inp) inp.classList.add('error');
-      valid = false;
-    } else {
-      if (inp) inp.classList.remove('error');
+}
+
+function renderDevConfig(container) {
+  const s = state.devStack;
+  const languages = Object.keys(frameworkMap);
+  const currentFrameworks = s.language ? (frameworkMap[s.language] || []) : [];
+
+  container.innerHTML =
+    '<div class="content-header">' +
+      '<div class="content-title"><i class="fas fa-sliders text-accent"></i> Configuração do Stack</div>' +
+      '<div class="content-desc">Defina as tecnologias do seu projeto. A IA usará esse contexto em todas as respostas.</div>' +
+    '</div>' +
+    '<div class="content-body">' +
+      '<div class="form-group">' +
+        '<label>Nome do Projeto (opcional)</label>' +
+        '<input type="text" id="cfgProjectName" value="' + escapeAttr(s.projectName) + '" placeholder="Meu Projeto">' +
+      '</div>' +
+      '<div class="config-grid">' +
+        '<div class="config-group">' +
+          '<label>Linguagem</label>' +
+          '<select id="cfgLanguage" onchange="onLanguageChange()">' +
+            '<option value="">Selecione...</option>' +
+            languages.map(function(l) { return '<option value="' + l + '"' + (s.language === l ? ' selected' : '') + '>' + l + '</option>'; }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div class="config-group">' +
+          '<label>Framework</label>' +
+          '<select id="cfgFramework">' +
+            '<option value="">Selecione...</option>' +
+            currentFrameworks.map(function(f) { return '<option value="' + f + '"' + (s.framework === f ? ' selected' : '') + '>' + f + '</option>'; }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div class="config-group">' +
+          '<label>Banco de Dados</label>' +
+          '<select id="cfgDatabase">' +
+            '<option value="">Selecione...</option>' +
+            databases.map(function(d) { return '<option value="' + d + '"' + (s.database === d ? ' selected' : '') + '>' + d + '</option>'; }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div class="config-group">' +
+          '<label>Padrão de Arquitetura</label>' +
+          '<select id="cfgArchitecture">' +
+            '<option value="">Selecione...</option>' +
+            architectures.map(function(a) { return '<option value="' + a + '"' + (s.architecture === a ? ' selected' : '') + '>' + a + '</option>'; }).join('') +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label>Ferramentas & Tecnologias Adicionais</label>' +
+        '<div class="chip-container" id="cfgTools">' +
+          toolOptions.map(function(t) { return '<div class="chip' + (s.tools.indexOf(t) > -1 ? ' selected' : '') + '" onclick="toggleChip(this, \'' + t + '\')">' + t + '</div>'; }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="form-actions">' +
+        '<button class="btn-primary" onclick="saveDevConfig()"><i class="fas fa-check"></i> Salvar Configuração</button>' +
+      '</div>' +
+      (getStackSummaryHTML().length > 0 ?
+        '<div style="margin-top: 12px;"><label style="font-family:var(--font-heading);font-size:0.8rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:block;font-weight:600;">Stack Atual</label>' +
+        '<div class="stack-summary">' + getStackSummaryHTML() + '</div></div>' : '') +
+    '</div>';
+}
+
+function onLanguageChange() {
+  const lang = document.getElementById('cfgLanguage').value;
+  state.devStack.language = lang;
+  const frameworks = frameworkMap[lang] || [];
+  const sel = document.getElementById('cfgFramework');
+  sel.innerHTML = '<option value="">Selecione...</option>' + frameworks.map(function(f) { return '<option value="' + f + '">' + f + '</option>'; }).join('');
+}
+
+function toggleChip(el, tool) {
+  el.classList.toggle('selected');
+  const idx = state.devStack.tools.indexOf(tool);
+  if (idx > -1) { state.devStack.tools.splice(idx, 1); } else { state.devStack.tools.push(tool); }
+}
+
+function saveDevConfig() {
+  const lang = document.getElementById('cfgLanguage').value;
+  if (!lang) { showAlertDialog('Atenção', 'Selecione ao menos a linguagem para continuar.'); return; }
+  state.devStack.language = lang;
+  state.devStack.framework = document.getElementById('cfgFramework').value;
+  state.devStack.database = document.getElementById('cfgDatabase').value;
+  state.devStack.architecture = document.getElementById('cfgArchitecture').value;
+  state.devStack.projectName = document.getElementById('cfgProjectName').value;
+  showToast('Stack configurado com sucesso!', 'success');
+  renderDevConfig(document.getElementById('devMainContent'));
+}
+
+function getStackSummaryHTML() {
+  const s = state.devStack;
+  const tags = [];
+  if (s.language) tags.push('<span class="stack-tag"><i class="fas fa-code"></i>' + s.language + '</span>');
+  if (s.framework) tags.push('<span class="stack-tag"><i class="fas fa-layer-group"></i>' + s.framework + '</span>');
+  if (s.database) tags.push('<span class="stack-tag"><i class="fas fa-database"></i>' + s.database + '</span>');
+  if (s.architecture) tags.push('<span class="stack-tag"><i class="fas fa-sitemap"></i>' + s.architecture + '</span>');
+  s.tools.forEach(function(t) { tags.push('<span class="stack-tag"><i class="fas fa-wrench"></i>' + t + '</span>'); });
+  return tags.join('');
+}
+
+function getStackContext() {
+  const s = state.devStack;
+  const parts = [];
+  if (s.projectName) parts.push('Projeto: ' + s.projectName);
+  if (s.language) parts.push('Linguagem: ' + s.language);
+  if (s.framework) parts.push('Framework: ' + s.framework);
+  if (s.database) parts.push('Banco de Dados: ' + s.database);
+  if (s.architecture) parts.push('Arquitetura: ' + s.architecture);
+  if (s.tools.length) parts.push('Ferramentas: ' + s.tools.join(', '));
+  return parts.length > 0 ? parts.join(' | ') : 'Nenhum stack configurado';
+}
+
+// ---- Dev Chat ----
+function renderDevChat(container, title, desc, mode) {
+  const chatId = 'dev-chat-' + mode;
+  container.innerHTML =
+    '<div class="content-header">' +
+      '<div class="content-title"><i class="fas fa-' + getChatIcon(mode) + ' text-accent"></i> ' + title + '</div>' +
+      '<div class="content-desc">' + desc + '</div>' +
+      (getStackSummaryHTML() ? '<div class="stack-summary" style="margin-top:10px;padding:10px;">' + getStackSummaryHTML() + '</div>' : '<div class="text-muted text-sm" style="margin-top:8px;"><i class="fas fa-info-circle"></i> Configure seu stack para respostas contextualizadas.</div>') +
+    '</div>' +
+    '<div class="content-body chat-container">' +
+      '<div class="chat-messages" id="' + chatId + '-messages">' +
+        '<div class="empty-hero" id="' + chatId + '-empty">' +
+          '<i class="fas fa-' + getChatIcon(mode) + '"></i>' +
+          '<h3>Pronto para ajudar</h3>' +
+          '<p>Digite sua pergunta abaixo para começar.</p>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="input-area">' +
+      '<div class="input-row">' +
+        '<div class="input-wrapper">' +
+          '<textarea id="' + chatId + '-input" placeholder="' + getChatPlaceholder(mode) + '" rows="1" onkeydown="handleDevChatKey(event, \'' + mode + '\')" oninput="autoResize(this)"></textarea>' +
+        '</div>' +
+        '<button class="btn-send" id="' + chatId + '-send" onclick="sendDevChat(\'' + mode + '\')" title="Enviar"><i class="fas fa-paper-plane"></i></button>' +
+      '</div>' +
+    '</div>';
+}
+
+function getChatIcon(mode) {
+  const icons = { assistant: 'robot', architecture: 'sitemap', debug: 'bug', codegen: 'wand-magic-sparkles', review: 'magnifying-glass-chart' };
+  return icons[mode] || 'comment';
+}
+
+function getChatPlaceholder(mode) {
+  const placeholders = {
+    assistant: 'Ex: Como implementar autenticação JWT no meu projeto?',
+    architecture: 'Ex: Qual a melhor estrutura de pastas para microservices?',
+    debug: 'Cole o erro ou descreva o bug...',
+    codegen: 'Ex: Crie um CRUD de usuários com validação',
+    review: 'Cole o código que deseja revisar...'
+  };
+  return placeholders[mode] || 'Digite sua mensagem...';
+}
+
+function getDevSystemPrompt(mode) {
+  const stack = getStackContext();
+  const prompts = {
+    assistant: 'Você é um desenvolvedor sênior e assistente de programação especialista. O stack do usuário é: [' + stack + ']. Responda sempre no contexto desse stack. Use markdown para formatar código com a linguagem especificada. Seja direto e prático. Sempre forneça exemplos de código quando relevante. Responda em português.',
+    architecture: 'Você é um arquiteto de software sênior. O stack do usuário é: [' + stack + ']. Forneça recomendações de arquitetura, design patterns, estrutura de projeto e boas práticas. Use diagramas em texto quando possível. Responda em português.',
+    debug: 'Você é um especialista em debugging e troubleshooting. O stack do usuário é: [' + stack + ']. Analise mensagens de erro, stack traces e comportamentos inesperados. Explique a causa raiz e forneça a solução com código. Responda em português.',
+    codegen: 'Você é um gerador de código especialista. O stack do usuário é: [' + stack + ']. Gere código limpo, bem comentado, seguindo boas práticas e patterns do stack configurado. Inclua tratamento de erros e validações. Responda em português.',
+    review: 'Você é um revisor de código sênior. O stack do usuário é: [' + stack + ']. Analise o código fornecido quanto a: qualidade, legibilidade, performance, segurança, boas práticas e possíveis bugs. Dê uma nota de 1-10 e sugira melhorias com código. Responda em português.'
+  };
+  return prompts[mode] || prompts.assistant;
+}
+
+function autoResize(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+}
+
+function handleDevChatKey(e, mode) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendDevChat(mode); }
+}
+
+async function sendDevChat(mode) {
+  const chatId = 'dev-chat-' + mode;
+  const input = document.getElementById(chatId + '-input');
+  const sendBtn = document.getElementById(chatId + '-send');
+  const msgContainer = document.getElementById(chatId + '-messages');
+  const emptyState = document.getElementById(chatId + '-empty');
+  const text = input.value.trim();
+  if (!text || state.isLoading) return;
+
+  if (emptyState) emptyState.remove();
+  state.isLoading = true;
+  sendBtn.disabled = true;
+  input.value = '';
+  input.style.height = 'auto';
+
+  // Add user message
+  appendMessage(msgContainer, text, true);
+
+  // Add AI loading
+  const aiMsgId = 'ai-msg-' + Date.now();
+  appendLoadingMessage(msgContainer, aiMsgId);
+  msgContainer.scrollTop = msgContainer.scrollHeight;
+
+  const systemPrompt = getDevSystemPrompt(mode);
+  const fullPrompt = systemPrompt + '\n\nPergunta do usuário:\n' + text;
+
+  const handlerName = 'dev-handler-' + Date.now();
+  window.Poe.registerHandler(handlerName, function(result) {
+    const msg = result.responses[0];
+    const aiMsgEl = document.getElementById(aiMsgId);
+    if (!aiMsgEl) return;
+    if (msg.status === 'error') {
+      aiMsgEl.querySelector('.msg-content').innerHTML = '<span style="color:var(--error)"><i class="fas fa-exclamation-triangle"></i> Erro: ' + (msg.statusText || 'Erro ao gerar resposta') + '</span>';
+      state.isLoading = false;
+      sendBtn.disabled = false;
+    } else if (msg.status === 'incomplete' || msg.status === 'complete') {
+      aiMsgEl.querySelector('.msg-content').innerHTML = renderMarkdown(msg.content);
+      msgContainer.scrollTop = msgContainer.scrollHeight;
+      if (msg.status === 'complete') {
+        state.isLoading = false;
+        sendBtn.disabled = false;
+        enhanceCodeBlocks(aiMsgEl);
+      }
     }
   });
-  if (!valid) showToast('Preencha todos os campos obrigatórios.', 'error');
-  return valid;
-}
 
-/* ============================================================
-   GENERATE PAYLOADS
-   ============================================================ */
-function buildPayloads(count) {
-  var payloads = [];
-  for (var i = 0; i < count; i++) {
-    var obj = {};
-    fields.forEach(function(f) {
-      if (f.name && f.name.trim()) {
-        obj[f.name.trim()] = generateValue(f);
-      }
+  try {
+    await window.Poe.sendUserMessage('@Claude-Sonnet-4.5 ' + fullPrompt, {
+      handler: handlerName,
+      stream: true,
+      openChat: false,
+      parameters: {}
     });
-    payloads.push(obj);
-  }
-  return payloads;
-}
-
-function generatePayloads() {
-  if (!validateFields()) return;
-  var count = parseInt(document.getElementById('numRequests').value, 10);
-  generatedPayloads = buildPayloads(count);
-  var format = document.getElementById('exportFormat').value;
-  var content = formatPayloads(generatedPayloads, format);
-  var ext = { json: '.json', ndjson: '.ndjson', csv: '.csv', sql: '.sql', postman: '.postman_collection.json' };
-  var mime = { json: 'application/json', ndjson: 'application/x-ndjson', csv: 'text/csv', sql: 'text/plain', postman: 'application/json' };
-  downloadFile(content, 'payloads' + (ext[format] || '.json'), mime[format] || 'application/json');
-  showToast(count + ' payloads gerados e baixados com sucesso!', 'success');
-}
-
-/* ============================================================
-   FORMAT / EXPORT
-   ============================================================ */
-function formatPayloads(payloads, format) {
-  switch (format) {
-    case 'json':
-      return JSON.stringify(payloads, null, 2);
-    case 'ndjson':
-      return payloads.map(function(p) { return JSON.stringify(p); }).join('\n');
-    case 'csv': {
-      if (payloads.length === 0) return '';
-      var keys = Object.keys(payloads[0]);
-      var lines = [keys.join(',')];
-      payloads.forEach(function(p) {
-        lines.push(keys.map(function(k) {
-          var v = p[k];
-          if (v === null || v === undefined) return '';
-          if (typeof v === 'string') return '"' + v.replace(/"/g, '""') + '"';
-          return String(v);
-        }).join(','));
-      });
-      return lines.join('\n');
+  } catch (err) {
+    const aiMsgEl = document.getElementById(aiMsgId);
+    if (aiMsgEl) {
+      aiMsgEl.querySelector('.msg-content').innerHTML = '<span style="color:var(--error)"><i class="fas fa-exclamation-triangle"></i> Erro: ' + escapeHTML(String(err)) + '</span>';
     }
-    case 'sql': {
-      var table = document.getElementById('sqlTableName').value || 'api_test_data';
-      if (payloads.length === 0) return '';
-      var cols = Object.keys(payloads[0]);
-      return payloads.map(function(p) {
-        var vals = cols.map(function(k) {
-          var v = p[k];
-          if (v === null || v === undefined) return 'NULL';
-          if (typeof v === 'boolean') return v ? 'TRUE' : 'FALSE';
-          if (typeof v === 'number') return String(v);
-          return "'" + String(v).replace(/'/g, "''") + "'";
-        }).join(', ');
-        return 'INSERT INTO ' + table + ' (' + cols.join(', ') + ') VALUES (' + vals + ');';
-      }).join('\n');
-    }
-    case 'postman': {
-      var collection = {
-        info: {
-          name: 'Generated API Tests',
-          schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
-        },
-        item: payloads.map(function(p, i) {
-          return {
-            name: 'Request ' + (i + 1),
-            request: {
-              method: 'POST',
-              header: [{ key: 'Content-Type', value: 'application/json' }],
-              body: { mode: 'raw', raw: JSON.stringify(p, null, 2), options: { raw: { language: 'json' } } },
-              url: { raw: '{{base_url}}/endpoint', host: ['{{base_url}}'], path: ['endpoint'] }
-            }
-          };
-        })
-      };
-      return JSON.stringify(collection, null, 2);
-    }
-    default:
-      return JSON.stringify(payloads, null, 2);
+    state.isLoading = false;
+    sendBtn.disabled = false;
   }
 }
 
-function downloadFile(content, filename, mimeType) {
-  var blob = new Blob([content], { type: mimeType });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
+// ---- QA Tool Rendering ----
+function selectQATool(btn, tool) {
+  document.querySelectorAll('#qaSidebar .sidebar-item').forEach(function(i) { i.classList.remove('active'); });
+  btn.classList.add('active');
+  state.qaTool = tool;
+  renderQATool(tool);
+  closeSidebar('qa');
+}
+
+function renderQATool(tool) {
+  const main = document.getElementById('qaMainContent');
+  switch(tool) {
+    case 'qa-testcases': renderTestCases(main); break;
+    case 'qa-postman': renderPostman(main); break;
+    case 'qa-scripts': renderTestScripts(main); break;
+    case 'qa-bugreport': renderBugReport(main); break;
+    case 'qa-testplan': renderTestPlan(main); break;
+    case 'qa-performance': renderPerformance(main); break;
+    case 'qa-json': renderJSONFormatter(main); break;
+    case 'qa-http': renderHTTPReference(main); break;
+    default: break;
+  }
+}
+
+// ---- QA: Test Cases ----
+function renderTestCases(container) {
+  container.innerHTML =
+    '<div class="content-header">' +
+      '<div class="content-title"><i class="fas fa-list-check text-accent"></i> Gerador de Casos de Teste</div>' +
+      '<div class="content-desc">Informe a task/user story e receba casos de teste completos com cenários positivos, negativos e de borda.</div>' +
+    '</div>' +
+    '<div class="content-body">' +
+      '<div class="form-panel">' +
+        '<div class="form-group">' +
+          '<label>User Story / Task / Requisito</label>' +
+          '<textarea id="qaTestInput" placeholder="Ex: Como usuário, quero poder redefinir minha senha via email para recuperar acesso à minha conta.\n\nOu descreva a funcionalidade a ser testada..." rows="5"></textarea>' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label>Tipo de Testes</label>' +
+          '<div class="chip-container" id="testTypeChips">' +
+            '<div class="chip selected" onclick="toggleTestType(this)">Funcionais</div>' +
+            '<div class="chip selected" onclick="toggleTestType(this)">Negativos</div>' +
+            '<div class="chip selected" onclick="toggleTestType(this)">Edge Cases</div>' +
+            '<div class="chip" onclick="toggleTestType(this)">Segurança</div>' +
+            '<div class="chip" onclick="toggleTestType(this)">Acessibilidade</div>' +
+            '<div class="chip" onclick="toggleTestType(this)">Usabilidade</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="form-actions">' +
+          '<button class="btn-primary" id="btnGenTests" onclick="generateTestCases()"><i class="fas fa-wand-magic-sparkles"></i> Gerar Casos de Teste</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="output-panel" id="qaTestOutput" style="display:none;">' +
+        '<div class="output-header">' +
+          '<span class="output-header-title"><i class="fas fa-file-lines"></i> Casos de Teste Gerados</span>' +
+          '<button class="btn-secondary" onclick="copyOutput(\'qaTestOutputBody\')" style="padding:6px 12px;font-size:0.8rem;"><i class="fas fa-copy"></i> Copiar</button>' +
+        '</div>' +
+        '<div class="output-body" id="qaTestOutputBody"></div>' +
+      '</div>' +
+    '</div>';
+}
+
+function toggleTestType(el) { el.classList.toggle('selected'); }
+
+function getSelectedTestTypes() {
+  const chips = document.querySelectorAll('#testTypeChips .chip.selected');
+  return Array.from(chips).map(function(c) { return c.textContent; });
+}
+
+async function generateTestCases() {
+  const input = document.getElementById('qaTestInput').value.trim();
+  if (!input) { showAlertDialog('Atenção', 'Descreva a task ou user story para gerar os casos de teste.'); return; }
+  const types = getSelectedTestTypes();
+  const outputPanel = document.getElementById('qaTestOutput');
+  const outputBody = document.getElementById('qaTestOutputBody');
+  const btn = document.getElementById('btnGenTests');
+  outputPanel.style.display = 'block';
+  outputBody.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div><div class="text-muted text-sm" style="margin-top:8px;">Gerando casos de teste...</div>';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+
+  const prompt = 'Você é um QA Engineer sênior especialista em testes de software. Gere casos de teste detalhados e profissionais para a seguinte task/user story:\n\n' +
+    '--- TASK ---\n' + input + '\n--- FIM ---\n\n' +
+    'Tipos de testes solicitados: ' + types.join(', ') + '\n\n' +
+    'Para cada caso de teste, inclua:\n- ID do caso de teste (TC-001, TC-002, etc.)\n- Título\n- Pré-condições\n- Passos\n- Resultado esperado\n- Prioridade (Alta/Média/Baixa)\n- Tipo (Funcional/Negativo/Edge Case/etc.)\n\nFormate em markdown com tabelas quando apropriado. Seja detalhado e cubra o máximo de cenários possível. Responda em português.';
+
+  await sendToAI(prompt, outputBody, function() {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Gerar Casos de Teste';
+  });
+}
+
+// ---- QA: Postman Collection ----
+function renderPostman(container) {
+  container.innerHTML =
+    '<div class="content-header">' +
+      '<div class="content-title"><i class="fas fa-paper-plane text-accent"></i> Postman Collection Builder</div>' +
+      '<div class="content-desc">Insira informações da API ou cole um caso de sucesso do Postman. A IA gera uma collection completa com testes.</div>' +
+    '</div>' +
+    '<div class="content-body">' +
+      '<div class="form-panel">' +
+        '<div class="form-group">' +
+          '<label>Descrição da API / Endpoint ou Cole um caso de sucesso</label>' +
+          '<textarea id="qaPostmanInput" placeholder="Opção 1: Descreva a API\nEx: API REST de gerenciamento de usuários com endpoints: GET /users, POST /users, PUT /users/:id, DELETE /users/:id. Base URL: https://api.exemplo.com/v1\n\nOpção 2: Cole o JSON de uma requisição de sucesso do Postman\n{&quot;method&quot;: &quot;POST&quot;, &quot;url&quot;: &quot;...&quot;, &quot;headers&quot;: {...}, &quot;body&quot;: {...}, &quot;response&quot;: {...}}" rows="8" style="font-family:var(--font-code);font-size:14px;"></textarea>' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label>Base URL (opcional)</label>' +
+          '<input type="text" id="qaPostmanBaseUrl" placeholder="https://api.exemplo.com/v1">' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label>Autenticação</label>' +
+          '<div class="chip-container" id="postmanAuthChips">' +
+            '<div class="chip selected" onclick="selectSingleChip(this, \'postmanAuthChips\')">Bearer Token</div>' +
+            '<div class="chip" onclick="selectSingleChip(this, \'postmanAuthChips\')">Basic Auth</div>' +
+            '<div class="chip" onclick="selectSingleChip(this, \'postmanAuthChips\')">API Key</div>' +
+            '<div class="chip" onclick="selectSingleChip(this, \'postmanAuthChips\')">OAuth 2.0</div>' +
+            '<div class="chip" onclick="selectSingleChip(this, \'postmanAuthChips\')">Sem Auth</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="form-actions">' +
+          '<button class="btn-primary" id="btnGenPostman" onclick="generatePostman()"><i class="fas fa-wand-magic-sparkles"></i> Gerar Collection</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="output-panel" id="qaPostmanOutput" style="display:none;">' +
+        '<div class="output-header">' +
+          '<span class="output-header-title"><i class="fas fa-file-code"></i> Postman Collection</span>' +
+          '<div style="display:flex;gap:8px;">' +
+            '<button class="btn-secondary" onclick="copyOutput(\'qaPostmanOutputBody\')" style="padding:6px 12px;font-size:0.8rem;"><i class="fas fa-copy"></i> Copiar</button>' +
+            '<button class="btn-download" id="btnDownloadPostman" onclick="downloadPostmanCollection()" style="display:none;"><i class="fas fa-download"></i> Baixar .json</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="output-body" id="qaPostmanOutputBody"></div>' +
+      '</div>' +
+    '</div>';
+}
+
+function selectSingleChip(el, containerId) {
+  document.querySelectorAll('#' + containerId + ' .chip').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+
+function getSelectedChipValue(containerId) {
+  const sel = document.querySelector('#' + containerId + ' .chip.selected');
+  return sel ? sel.textContent : '';
+}
+
+let lastPostmanJSON = null;
+
+async function generatePostman() {
+  const input = document.getElementById('qaPostmanInput').value.trim();
+  if (!input) { showAlertDialog('Atenção', 'Descreva a API ou cole um caso de sucesso.'); return; }
+  const baseUrl = document.getElementById('qaPostmanBaseUrl').value.trim();
+  const auth = getSelectedChipValue('postmanAuthChips');
+  const outputPanel = document.getElementById('qaPostmanOutput');
+  const outputBody = document.getElementById('qaPostmanOutputBody');
+  const btn = document.getElementById('btnGenPostman');
+  const dlBtn = document.getElementById('btnDownloadPostman');
+  outputPanel.style.display = 'block';
+  dlBtn.style.display = 'none';
+  outputBody.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div><div class="text-muted text-sm" style="margin-top:8px;">Gerando Postman Collection...</div>';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+  lastPostmanJSON = null;
+
+  const prompt = 'Você é um especialista em testes de API e Postman. Gere uma Postman Collection v2.1 COMPLETA em formato JSON válido.\n\n' +
+    '--- INPUT DO USUÁRIO ---\n' + input + '\n--- FIM ---\n\n' +
+    (baseUrl ? 'Base URL: ' + baseUrl + '\n' : '') +
+    'Autenticação: ' + auth + '\n\n' +
+    'A collection DEVE incluir:\n' +
+    '1. Variáveis de environment (baseUrl, token, etc.)\n' +
+    '2. Requests para cada endpoint com:\n   - Headers apropriados\n   - Body de exemplo (para POST/PUT)\n   - Tests scripts (verificar status code, schema, tempo de resposta)\n   - Pre-request scripts quando necessário\n' +
+    '3. Cenários de sucesso (200, 201)\n' +
+    '4. Cenários de erro (400, 401, 403, 404, 422, 500)\n' +
+    '5. Testes de validação de campos\n' +
+    '6. Pasta organizada por recurso/endpoint\n\n' +
+    'IMPORTANTE: Retorne APENAS o JSON válido da Postman Collection. Nenhum texto antes ou depois. O JSON deve ser importável diretamente no Postman.';
+
+  const handlerName = 'postman-handler-' + Date.now();
+  let fullContent = '';
+
+  window.Poe.registerHandler(handlerName, function(result) {
+    const msg = result.responses[0];
+    if (msg.status === 'error') {
+      outputBody.innerHTML = '<span style="color:var(--error)"><i class="fas fa-exclamation-triangle"></i> Erro: ' + (msg.statusText || 'Erro ao gerar') + '</span>';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Gerar Collection';
+    } else if (msg.status === 'incomplete' || msg.status === 'complete') {
+      fullContent = msg.content;
+      outputBody.innerHTML = renderMarkdown(msg.content);
+      if (msg.status === 'complete') {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Gerar Collection';
+        enhanceCodeBlocks(outputBody.parentElement);
+        // Try to extract JSON for download
+        try {
+          let jsonStr = fullContent;
+          const jsonMatch = fullContent.match(/```(?:json)?\s*([\s\S]*?)```/);
+          if (jsonMatch) jsonStr = jsonMatch[1];
+          jsonStr = jsonStr.trim();
+          lastPostmanJSON = JSON.parse(jsonStr);
+          dlBtn.style.display = 'inline-flex';
+        } catch(e) {
+          // If can't parse JSON, still show the content but hide download
+          lastPostmanJSON = fullContent;
+          dlBtn.style.display = 'inline-flex';
+        }
+      }
+    }
+  });
+
+  try {
+    await window.Poe.sendUserMessage('@Claude-Sonnet-4.5 ' + prompt, {
+      handler: handlerName,
+      stream: true,
+      openChat: false,
+      parameters: {}
+    });
+  } catch (err) {
+    outputBody.innerHTML = '<span style="color:var(--error)"><i class="fas fa-exclamation-triangle"></i> Erro: ' + escapeHTML(String(err)) + '</span>';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Gerar Collection';
+  }
+}
+
+function downloadPostmanCollection() {
+  if (!lastPostmanJSON) return;
+  let content;
+  if (typeof lastPostmanJSON === 'string') {
+    content = lastPostmanJSON;
+  } else {
+    content = JSON.stringify(lastPostmanJSON, null, 2);
+  }
+  const blob = new Blob([content], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
   a.href = url;
-  a.download = filename;
+  a.download = 'postman_collection.json';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  showToast('Collection baixada!', 'success');
 }
 
-/* ============================================================
-   PREVIEW
-   ============================================================ */
-function previewPayloads() {
-  if (!validateFields()) return;
-  var sample = buildPayloads(Math.min(3, parseInt(document.getElementById('numRequests').value, 10) || 3));
-  var json = JSON.stringify(sample, null, 2);
-  document.getElementById('previewContent').innerHTML = syntaxHighlight(json);
-  document.getElementById('previewInfo').textContent = 'Mostrando ' + sample.length + ' de ' + (document.getElementById('numRequests').value || 0) + ' payloads.';
-  switchTab('preview');
-  showToast('Preview gerado!', 'info');
-}
-
-function syntaxHighlight(json) {
-  json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  return json.replace(/("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, function(match) {
-    var cls = 'number';
-    if (/^"/.test(match)) {
-      cls = /:$/.test(match) ? 'key' : 'string';
-    } else if (/true|false/.test(match)) {
-      cls = 'boolean';
-    } else if (/null/.test(match)) {
-      cls = 'null';
-    }
-    return '<span class="' + cls + '">' + match + '</span>';
-  });
-}
-
-function copyPreview() {
-  var text = document.getElementById('previewContent').textContent;
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(function() {
-      showToast('JSON copiado!', 'success');
-    });
-  }
-}
-
-/* ============================================================
-   IMPORT TEMPLATE
-   ============================================================ */
-function importTemplate() {
-  var raw = document.getElementById('importJson').value.trim();
-  if (!raw) { showToast('Cole um JSON para importar.', 'error'); return; }
-  var parsed;
-  try {
-    parsed = JSON.parse(raw);
-  } catch (e) {
-    showToast('JSON inválido: ' + e.message, 'error');
-    return;
-  }
-  if (Array.isArray(parsed)) parsed = parsed[0];
-  if (!parsed || typeof parsed !== 'object') {
-    showToast('O JSON deve ser um objeto.', 'error');
-    return;
-  }
-  fields = [];
-  Object.keys(parsed).forEach(function(key) {
-    var val = parsed[key];
-    var type = inferType(key, val);
-    fields.push({ name: key, type: type, invalid: false, options: {}, showOptions: false });
-  });
-  document.getElementById('numFields').value = fields.length;
-  renderFields();
-  document.getElementById('fieldsCard').style.display = 'block';
-  document.getElementById('actionsCard').style.display = 'block';
-  switchTab('generator');
-  showToast(fields.length + ' campos importados!', 'success');
-}
-
-function inferType(key, val) {
-  var k = key.toLowerCase();
-  if (val === null) return 'null';
-  if (typeof val === 'boolean') return 'boolean';
-  if (typeof val === 'number') {
-    return Number.isInteger(val) ? 'int' : 'decimal';
-  }
-  if (typeof val === 'string') {
-    if (/^\d{11}$/.test(val) && (k.includes('cpf'))) return 'cpf';
-    if (/^\d{14}$/.test(val) && (k.includes('cnpj'))) return 'cnpj';
-    if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val)) return 'email';
-    if (/^\(\d{2}\)\s?9?\d{4}-?\d{4}$/.test(val)) return 'telefone';
-    if (/^\d{5}-?\d{3}$/.test(val)) return 'cep';
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(val)) return 'date';
-    if (/^\d{4}-\d{2}-\d{2}T/.test(val)) return 'timestamp';
-    if (/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val)) return 'uuid';
-    return 'string';
-  }
-  return 'string';
-}
-
-/* ============================================================
-   TEMPLATES
-   ============================================================ */
-function saveAsTemplate() {
-  if (fields.length === 0) { showToast('Configure os campos primeiro.', 'error'); return; }
-  showModal('Salvar Template', 'Dê um nome para este template:', function(name) {
-    if (!name || !name.trim()) { showToast('Nome obrigatório.', 'error'); return; }
-    savedTemplates.push({
-      name: name.trim(),
-      fields: JSON.parse(JSON.stringify(fields)),
-      createdAt: new Date().toLocaleString('pt-BR')
-    });
-    renderTemplates();
-    showToast('Template "' + name.trim() + '" salvo!', 'success');
-  }, { input: true, inputPlaceholder: 'Ex: Cadastro de Usuário', confirmText: 'Salvar' });
-}
-
-function loadTemplate(idx) {
-  var tpl = savedTemplates[idx];
-  if (!tpl) return;
-  fields = JSON.parse(JSON.stringify(tpl.fields));
-  document.getElementById('numFields').value = fields.length;
-  renderFields();
-  document.getElementById('fieldsCard').style.display = 'block';
-  document.getElementById('actionsCard').style.display = 'block';
-  switchTab('generator');
-  showToast('Template "' + tpl.name + '" carregado!', 'success');
-}
-
-function deleteTemplate(idx) {
-  showModal('Excluir Template', 'Tem certeza que deseja excluir este template?', function() {
-    savedTemplates.splice(idx, 1);
-    renderTemplates();
-    showToast('Template removido.', 'info');
-  }, { confirmText: 'Excluir' });
-}
-
-function renderTemplates() {
-  var container = document.getElementById('templatesList');
-  if (savedTemplates.length === 0) {
-    container.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>Nenhum template salvo ainda.</p></div>';
-    return;
-  }
-  container.innerHTML = savedTemplates.map(function(t, i) {
-    return '<div class="template-item">' +
-      '<div class="template-info">' +
-        '<div class="template-name"><i class="fas fa-file-code" style="color:var(--accent);margin-right:6px"></i>' + escHtml(t.name) + '</div>' +
-        '<div class="template-meta">' + t.fields.length + ' campos &bull; ' + t.createdAt + '</div>' +
-      '</div>' +
-      '<div class="template-actions">' +
-        '<button class="btn btn-secondary btn-sm" onclick="loadTemplate(' + i + ')"><i class="fas fa-upload"></i> Carregar</button>' +
-        '<button class="btn-icon delete" onclick="deleteTemplate(' + i + ')"><i class="fas fa-trash"></i></button>' +
-      '</div></div>';
-  }).join('');
-}
-
-function exportTemplate(idx) {
-  var tpl = savedTemplates[idx];
-  downloadFile(JSON.stringify(tpl, null, 2), tpl.name.replace(/\s+/g, '_') + '.json', 'application/json');
-}
-
-/* ============================================================
-   LOAD TEST
-   ============================================================ */
-var loadTestRunning = false;
-
-function startLoadTest() {
-  if (loadTestRunning) { showToast('Um teste já está em execução.', 'error'); return; }
-  var url = document.getElementById('apiUrl').value.trim();
-  if (!url) { document.getElementById('apiUrl').classList.add('error'); showToast('Informe a URL da API.', 'error'); return; }
-  document.getElementById('apiUrl').classList.remove('error');
-
-  var method = document.getElementById('httpMethod').value;
-  var numReq = parseInt(document.getElementById('ltRequests').value, 10) || 10;
-  var concurrency = parseInt(document.getElementById('ltConcurrency').value, 10) || 5;
-
-  var headers = { 'Content-Type': 'application/json' };
-  var customH = document.getElementById('customHeaders').value.trim();
-  if (customH) {
-    try {
-      var parsed = JSON.parse(customH);
-      Object.assign(headers, parsed);
-    } catch (e) {
-      showToast('Headers JSON inválido.', 'error');
-      return;
-    }
-  }
-
-  if (fields.length === 0 || !validateFields()) {
-    showToast('Configure e valide os campos do payload primeiro.', 'error');
-    return;
-  }
-
-  var payloads = buildPayloads(numReq);
-  loadTestRunning = true;
-  loadTestAbort = new AbortController();
-
-  document.getElementById('btnLoadTest').classList.add('hidden');
-  document.getElementById('btnStopTest').classList.remove('hidden');
-  document.getElementById('ltProgress').classList.remove('hidden');
-  document.getElementById('ltProgressFill').style.width = '0%';
-  document.getElementById('ltStatus').textContent = 'Iniciando teste...';
-
-  var results = [];
-  var completed = 0;
-  var queue = payloads.slice();
-  var startTime = performance.now();
-
-  function updateUI() {
-    var pct = Math.round((completed / numReq) * 100);
-    document.getElementById('ltProgressFill').style.width = pct + '%';
-    document.getElementById('ltStatus').textContent = completed + '/' + numReq + ' requisições concluídas (' + pct + '%)';
-  }
-
-  function processItem() {
-    if (!loadTestRunning || queue.length === 0) return Promise.resolve();
-    var payload = queue.shift();
-    var reqStart = performance.now();
-    return fetch(url, {
-      method: method,
-      headers: headers,
-      body: JSON.stringify(payload),
-      signal: loadTestAbort.signal
-    }).then(function(response) {
-      var elapsed = performance.now() - reqStart;
-      results.push({ status: response.status, success: response.ok, time: elapsed });
-      completed++;
-      updateUI();
-      return processItem();
-    }).catch(function(err) {
-      var elapsed = performance.now() - reqStart;
-      if (err.name === 'AbortError') return;
-      results.push({ status: 0, success: false, time: elapsed, error: err.message });
-      completed++;
-      updateUI();
-      return processItem();
-    });
-  }
-
-  var workers = [];
-  for (var w = 0; w < concurrency; w++) {
-    workers.push(processItem());
-  }
-
-  Promise.all(workers).then(function() {
-    var totalTime = performance.now() - startTime;
-    finishLoadTest(results, totalTime, numReq);
-  });
-}
-
-function stopLoadTest() {
-  loadTestRunning = false;
-  if (loadTestAbort) loadTestAbort.abort();
-  document.getElementById('btnLoadTest').classList.remove('hidden');
-  document.getElementById('btnStopTest').classList.add('hidden');
-  document.getElementById('ltStatus').textContent = 'Teste interrompido.';
-  showToast('Teste de carga interrompido.', 'info');
-}
-
-function finishLoadTest(results, totalTime, total) {
-  loadTestRunning = false;
-  document.getElementById('btnLoadTest').classList.remove('hidden');
-  document.getElementById('btnStopTest').classList.add('hidden');
-  document.getElementById('ltProgressFill').style.width = '100%';
-  document.getElementById('ltStatus').textContent = 'Teste concluído!';
-  showToast('Teste de carga concluído! Veja o relatório.', 'success');
-
-  var successes = results.filter(function(r) { return r.success; }).length;
-  var errors = results.filter(function(r) { return !r.success; }).length;
-  var times = results.map(function(r) { return r.time; });
-  var avgTime = times.length > 0 ? (times.reduce(function(a, b) { return a + b; }, 0) / times.length) : 0;
-  var minTime = times.length > 0 ? Math.min.apply(null, times) : 0;
-  var maxTime = times.length > 0 ? Math.max.apply(null, times) : 0;
-
-  var reportHtml =
-    '<div class="stats-grid">' +
-      '<div class="stat-card blue"><div class="stat-val">' + results.length + '</div><div class="stat-label">Total Enviadas</div></div>' +
-      '<div class="stat-card green"><div class="stat-val">' + successes + '</div><div class="stat-label">Sucessos</div></div>' +
-      '<div class="stat-card red"><div class="stat-val">' + errors + '</div><div class="stat-label">Erros</div></div>' +
-      '<div class="stat-card yellow"><div class="stat-val">' + avgTime.toFixed(0) + 'ms</div><div class="stat-label">Tempo Médio</div></div>' +
+// ---- QA: Test Scripts ----
+function renderTestScripts(container) {
+  container.innerHTML =
+    '<div class="content-header">' +
+      '<div class="content-title"><i class="fas fa-terminal text-accent"></i> Gerador de Scripts de Teste</div>' +
+      '<div class="content-desc">Gere scripts automatizados para rodar testes de API, integração ou E2E.</div>' +
     '</div>' +
-    '<div class="stats-grid">' +
-      '<div class="stat-card"><div class="stat-val" style="color:var(--text)">' + minTime.toFixed(0) + 'ms</div><div class="stat-label">Mais Rápida</div></div>' +
-      '<div class="stat-card"><div class="stat-val" style="color:var(--text)">' + maxTime.toFixed(0) + 'ms</div><div class="stat-label">Mais Lenta</div></div>' +
-      '<div class="stat-card"><div class="stat-val" style="color:var(--text)">' + (totalTime / 1000).toFixed(2) + 's</div><div class="stat-label">Tempo Total</div></div>' +
-      '<div class="stat-card"><div class="stat-val" style="color:var(--text)">' + (results.length / (totalTime / 1000)).toFixed(1) + '</div><div class="stat-label">Req/s</div></div>' +
+    '<div class="content-body">' +
+      '<div class="form-panel">' +
+        '<div class="form-group">' +
+          '<label>Descreva os Endpoints / Cenários</label>' +
+          '<textarea id="qaScriptInput" placeholder="Descreva os endpoints e cenários que devem ser testados.\nEx: Testar o fluxo completo de CRUD de produtos:\n- POST /products (criar)\n- GET /products (listar)\n- GET /products/:id (buscar)\n- PUT /products/:id (atualizar)\n- DELETE /products/:id (deletar)\n\nBase URL: https://api.exemplo.com" rows="6"></textarea>' +
+        '</div>' +
+        '<div class="config-grid">' +
+          '<div class="config-group">' +
+            '<label>Framework de Teste</label>' +
+            '<select id="qaScriptFramework">' +
+              '<option value="Newman (Postman CLI)">Newman (Postman CLI)</option>' +
+              '<option value="Jest + Axios">Jest + Axios</option>' +
+              '<option value="Pytest + Requests">Pytest + Requests</option>' +
+              '<option value="RestAssured (Java)">RestAssured (Java)</option>' +
+              '<option value="Cypress">Cypress</option>' +
+              '<option value="Playwright">Playwright</option>' +
+              '<option value="K6 (Load Testing)">K6 (Load Testing)</option>' +
+              '<option value="Artillery">Artillery</option>' +
+              '<option value="Robot Framework">Robot Framework</option>' +
+            '</select>' +
+          '</div>' +
+          '<div class="config-group">' +
+            '<label>Tipo de Teste</label>' +
+            '<select id="qaScriptType">' +
+              '<option value="API / Integração">API / Integração</option>' +
+              '<option value="End-to-End">End-to-End</option>' +
+              '<option value="Carga / Performance">Carga / Performance</option>' +
+              '<option value="Contrato">Contrato</option>' +
+              '<option value="Smoke Test">Smoke Test</option>' +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+        '<div class="form-actions">' +
+          '<button class="btn-primary" id="btnGenScript" onclick="generateTestScript()"><i class="fas fa-wand-magic-sparkles"></i> Gerar Script</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="output-panel" id="qaScriptOutput" style="display:none;">' +
+        '<div class="output-header">' +
+          '<span class="output-header-title"><i class="fas fa-file-code"></i> Script Gerado</span>' +
+          '<button class="btn-secondary" onclick="copyOutput(\'qaScriptOutputBody\')" style="padding:6px 12px;font-size:0.8rem;"><i class="fas fa-copy"></i> Copiar</button>' +
+        '</div>' +
+        '<div class="output-body" id="qaScriptOutputBody"></div>' +
+      '</div>' +
     '</div>';
-
-  if (results.length > 0) {
-    var statusGroups = {};
-    results.forEach(function(r) {
-      var code = r.status || 'Erro';
-      statusGroups[code] = (statusGroups[code] || 0) + 1;
-    });
-    reportHtml += '<div style="margin-top:16px"><strong class="text-sm" style="color:var(--text2)">Distribuição de Status</strong>';
-    reportHtml += '<table class="results-table mt-12"><thead><tr><th>Status</th><th>Quantidade</th><th>%</th></tr></thead><tbody>';
-    Object.keys(statusGroups).forEach(function(code) {
-      var cnt = statusGroups[code];
-      var pct = ((cnt / results.length) * 100).toFixed(1);
-      var isOk = /^2/.test(String(code));
-      reportHtml += '<tr><td><span class="status-badge ' + (isOk ? 'ok' : 'fail') + '">' + code + '</span></td><td>' + cnt + '</td><td>' + pct + '%</td></tr>';
-    });
-    reportHtml += '</tbody></table></div>';
-  }
-
-  reportHtml += '<button class="btn btn-secondary btn-sm mt-16" onclick="exportReport()"><i class="fas fa-download"></i> Exportar Relatório</button>';
-
-  document.getElementById('reportContent').innerHTML = reportHtml;
-  window._lastReport = { results: results, totalTime: totalTime, successes: successes, errors: errors, avgTime: avgTime };
-  switchTab('report');
 }
 
-function exportReport() {
-  var r = window._lastReport;
-  if (!r) return;
-  var text = 'RELATÓRIO DE TESTE DE CARGA\n' +
-    '===========================\n\n' +
-    'Total Enviadas: ' + r.results.length + '\n' +
-    'Sucessos: ' + r.successes + '\n' +
-    'Erros: ' + r.errors + '\n' +
-    'Tempo Médio: ' + r.avgTime.toFixed(2) + 'ms\n' +
-    'Tempo Total: ' + (r.totalTime / 1000).toFixed(2) + 's\n' +
-    'Req/s: ' + (r.results.length / (r.totalTime / 1000)).toFixed(1) + '\n';
-  downloadFile(text, 'relatorio_teste.txt', 'text/plain');
-  showToast('Relatório exportado!', 'success');
-}
+async function generateTestScript() {
+  const input = document.getElementById('qaScriptInput').value.trim();
+  if (!input) { showAlertDialog('Atenção', 'Descreva os endpoints e cenários para gerar o script.'); return; }
+  const framework = document.getElementById('qaScriptFramework').value;
+  const type = document.getElementById('qaScriptType').value;
+  const outputPanel = document.getElementById('qaScriptOutput');
+  const outputBody = document.getElementById('qaScriptOutputBody');
+  const btn = document.getElementById('btnGenScript');
+  outputPanel.style.display = 'block';
+  outputBody.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div><div class="text-muted text-sm" style="margin-top:8px;">Gerando script de teste...</div>';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
 
-/* ============================================================
-   HELP CENTER
-   ============================================================ */
-var helpOpen = false;
-var helpContent = {
-  generator: {
-    icon: 'fa-cogs',
-    title: 'Gerador de Payloads',
-    sections: [
-      {
-        title: 'Como usar',
-        icon: 'fa-route',
-        steps: [
-          'Defina quantos <strong>campos</strong> o JSON terá e quantas <strong>requisições</strong> (payloads) deseja gerar.',
-          'Clique em <strong>"Gerar Campos"</strong> para criar as linhas de configuração.',
-          'Para cada campo, preencha o <strong>nome</strong> (ex: "nome", "cpf") e escolha o <strong>tipo de dado</strong>.',
-          'Use o botão <strong><i class="fas fa-sliders-h"></i></strong> para configurar limites (tamanho de string, intervalo numérico, etc.).',
-          'Ative o toggle <strong>"Inválido"</strong> em campos que deseja gerar com dados propositalmente errados (testes negativos).',
-          'Escolha o <strong>formato de exportação</strong> e clique em <strong>"Gerar Payloads"</strong> para baixar o arquivo.'
-        ]
-      },
-      {
-        title: 'Tipos de dados disponíveis',
-        icon: 'fa-database',
-        steps: [
-          '<strong>String</strong> &mdash; texto aleatório (tamanho configurável)',
-          '<strong>Inteiro / Decimal</strong> &mdash; números com intervalo e precisão',
-          '<strong>CPF / CNPJ</strong> &mdash; documentos brasileiros com dígitos verificadores válidos',
-          '<strong>Email / Telefone / CEP</strong> &mdash; formatos brasileiros realistas',
-          '<strong>Data / Timestamp</strong> &mdash; datas com intervalo configurável',
-          '<strong>UUID</strong> &mdash; identificadores únicos v4',
-          '<strong>Enum</strong> &mdash; valores fixos definidos por você',
-          '<strong>Booleano / Nulo</strong> &mdash; true/false ou null'
-        ]
-      }
-    ],
-    tip: 'Use o botão "Preview" para verificar a estrutura antes de gerar o arquivo completo.'
-  },
-  preview: {
-    icon: 'fa-eye',
-    title: 'Preview do Payload',
-    sections: [
-      {
-        title: 'O que faz',
-        icon: 'fa-info-circle',
-        steps: [
-          'Mostra uma <strong>pré-visualização</strong> de até 3 payloads gerados com a configuração atual.',
-          'O JSON é exibido com <strong>syntax highlighting</strong> (cores para chaves, strings, números, etc.).',
-          'Use o botão <strong>"Copiar"</strong> para copiar o JSON para a área de transferência.'
-        ]
-      },
-      {
-        title: 'Como chegar aqui',
-        icon: 'fa-route',
-        steps: [
-          'Configure os campos na aba <strong>Gerador</strong>.',
-          'Clique no botão <strong>"Preview"</strong> na seção de ações.',
-          'Você será redirecionado automaticamente para esta aba.'
-        ]
-      }
-    ],
-    tip: 'Cada vez que clica em Preview, novos dados aleatórios são gerados. Use para verificar a variedade.'
-  },
-  import: {
-    icon: 'fa-file-import',
-    title: 'Importar Template JSON',
-    sections: [
-      {
-        title: 'Como usar',
-        icon: 'fa-route',
-        steps: [
-          'Cole um <strong>JSON modelo</strong> na caixa de texto. Pode ser um objeto ou um array (usa o primeiro item).',
-          'Clique em <strong>"Interpretar e Importar"</strong>.',
-          'O sistema analisa cada campo e <strong>infere o tipo automaticamente</strong> (CPF, email, data, UUID, etc.).',
-          'Você é redirecionado ao <strong>Gerador</strong> com os campos já preenchidos para ajustar.'
-        ]
-      },
-      {
-        title: 'Tipos detectados automaticamente',
-        icon: 'fa-magic',
-        steps: [
-          '<strong>CPF</strong> &mdash; 11 dígitos + nome do campo contém "cpf"',
-          '<strong>CNPJ</strong> &mdash; 14 dígitos + nome do campo contém "cnpj"',
-          '<strong>Email</strong> &mdash; formato usuario@dominio.com',
-          '<strong>Data</strong> &mdash; formato DD/MM/YYYY',
-          '<strong>Timestamp</strong> &mdash; formato ISO 8601 (YYYY-MM-DDT...)',
-          '<strong>UUID</strong> &mdash; formato padrão com hífens',
-          '<strong>Booleano, Inteiro, Decimal</strong> &mdash; pelo tipo do valor'
-        ]
-      }
-    ],
-    tip: 'Dica: copie um payload real da sua API e cole aqui para gerar dados de teste com a mesma estrutura.'
-  },
-  templates: {
-    icon: 'fa-bookmark',
-    title: 'Templates Salvos',
-    sections: [
-      {
-        title: 'Como usar',
-        icon: 'fa-route',
-        steps: [
-          'Na aba <strong>Gerador</strong>, após configurar seus campos, clique em <strong>"Salvar Template"</strong>.',
-          'Dê um <strong>nome descritivo</strong> ao template (ex: "Cadastro Usuário", "Pedido de Compra").',
-          'Seus templates aparecem aqui listados com nome, nº de campos e data de criação.',
-          'Use <strong>"Carregar"</strong> para restaurar a configuração no Gerador a qualquer momento.',
-          'Use o <strong><i class="fas fa-trash"></i></strong> para remover templates que não precisa mais.'
-        ]
-      }
-    ],
-    tip: 'Templates ficam salvos apenas durante a sessão atual. Ao recarregar a página, eles são perdidos.'
-  },
-  loadtest: {
-    icon: 'fa-bolt',
-    title: 'Teste de Carga em API',
-    sections: [
-      {
-        title: 'Como usar',
-        icon: 'fa-route',
-        steps: [
-          'Primeiro, configure os <strong>campos do payload</strong> na aba Gerador.',
-          'Informe a <strong>URL da API</strong> destino (deve suportar CORS).',
-          'Escolha o <strong>método HTTP</strong> (POST, PUT ou PATCH).',
-          'Defina o número de <strong>requisições</strong> e a <strong>concorrência</strong> (quantas simultâneas).',
-          'Opcionalmente, adicione <strong>headers customizados</strong> em formato JSON (ex: Authorization).',
-          'Clique em <strong>"Iniciar Teste"</strong> e acompanhe a barra de progresso.',
-          'Use <strong>"Parar"</strong> para interromper a qualquer momento.'
-        ]
-      },
-      {
-        title: 'Configurações',
-        icon: 'fa-cog',
-        steps: [
-          '<strong>Requisições</strong> &mdash; total de payloads a enviar (1 a 1000)',
-          '<strong>Concorrência</strong> &mdash; quantas requisições simultâneas (1 a 50)',
-          '<strong>Headers</strong> &mdash; JSON com headers adicionais (Authorization, API keys, etc.)'
-        ]
-      }
-    ],
-    tip: 'A API destino precisa ter CORS habilitado. Se os requests falharem, verifique as configurações de CORS do servidor.'
-  },
-  report: {
-    icon: 'fa-chart-bar',
-    title: 'Relatório de Execução',
-    sections: [
-      {
-        title: 'O que mostra',
-        icon: 'fa-info-circle',
-        steps: [
-          '<strong>Total de requisições</strong> enviadas ao endpoint.',
-          '<strong>Sucessos</strong> (status 2xx) e <strong>Erros</strong> (outros status ou falhas de rede).',
-          '<strong>Tempo médio</strong>, <strong>mais rápida</strong> e <strong>mais lenta</strong> das respostas.',
-          '<strong>Tempo total</strong> de execução do teste.',
-          '<strong>Req/s</strong> &mdash; throughput médio (requisições por segundo).',
-          '<strong>Distribuição de status</strong> &mdash; tabela com cada código HTTP e sua porcentagem.'
-        ]
-      },
-      {
-        title: 'Exportar',
-        icon: 'fa-download',
-        steps: [
-          'Clique em <strong>"Exportar Relatório"</strong> para baixar um arquivo .txt com o resumo dos resultados.'
-        ]
-      }
-    ],
-    tip: 'Execute o teste na aba "Teste de Carga" e os resultados aparecerão aqui automaticamente.'
-  }
-};
+  const prompt = 'Você é um QA Engineer sênior especialista em automação de testes. Gere um script de teste completo e profissional.\n\n' +
+    '--- CENÁRIOS ---\n' + input + '\n--- FIM ---\n\n' +
+    'Framework: ' + framework + '\nTipo de teste: ' + type + '\n\n' +
+    'O script DEVE incluir:\n' +
+    '1. Setup e configuração completa\n' +
+    '2. Variáveis de ambiente\n' +
+    '3. Testes para cada cenário (sucesso e erro)\n' +
+    '4. Assertions detalhadas (status code, body, headers, tempo)\n' +
+    '5. Cleanup/teardown\n' +
+    '6. Comentários explicativos\n' +
+    '7. Instruções de como rodar o script\n' +
+    '8. Dependências necessárias (package.json, requirements.txt, etc.)\n\n' +
+    'Formate com markdown e code blocks com a linguagem correta. Responda em português.';
 
-var helpTabMap = ['generator', 'preview', 'import', 'templates', 'loadtest', 'report'];
-var helpTabLabels = {
-  generator: 'Gerador', preview: 'Preview', import: 'Importar',
-  templates: 'Templates', loadtest: 'Teste de Carga', report: 'Relatório'
-};
-
-function toggleHelp() {
-  helpOpen = !helpOpen;
-  document.getElementById('helpPanel').classList.toggle('open', helpOpen);
-  document.getElementById('helpFab').classList.toggle('active', helpOpen);
-  document.getElementById('helpFab').innerHTML = helpOpen ? '<i class="fas fa-times"></i>' : '?';
-  if (helpOpen) {
-    renderHelpNav();
-    renderHelpForActiveTab();
-  }
-}
-
-function getActiveTab() {
-  var active = document.querySelector('.tab-btn.active');
-  return active ? active.dataset.tab : 'generator';
-}
-
-function renderHelpNav() {
-  var activeTab = getActiveTab();
-  var nav = document.getElementById('helpNav');
-  nav.innerHTML = helpTabMap.map(function(tab) {
-    return '<button class="help-nav-btn' + (tab === activeTab ? ' active' : '') + '" onclick="showHelpFor(\'' + tab + '\')">' + helpTabLabels[tab] + '</button>';
-  }).join('');
-}
-
-function showHelpFor(tab) {
-  document.querySelectorAll('.help-nav-btn').forEach(function(btn) {
-    btn.classList.toggle('active', btn.textContent === helpTabLabels[tab]);
+  await sendToAI(prompt, outputBody, function() {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Gerar Script';
   });
-  renderHelpContent(tab);
 }
 
-function renderHelpForActiveTab() {
-  renderHelpContent(getActiveTab());
+// ---- QA: Bug Report ----
+function renderBugReport(container) {
+  container.innerHTML =
+    '<div class="content-header">' +
+      '<div class="content-title"><i class="fas fa-bug text-accent"></i> Assistente de Bug Report</div>' +
+      '<div class="content-desc">Descreva o problema encontrado e a IA estrutura um bug report profissional.</div>' +
+    '</div>' +
+    '<div class="content-body">' +
+      '<div class="form-panel">' +
+        '<div class="form-group">' +
+          '<label>Descrição do Bug</label>' +
+          '<textarea id="qaBugInput" placeholder="Descreva o que aconteceu:\nEx: Ao tentar salvar um produto com preço negativo, o sistema aceita sem validação e exibe o valor negativo na listagem.\n\nComportamento esperado: O sistema deveria bloquear valores negativos e exibir mensagem de erro." rows="6"></textarea>' +
+        '</div>' +
+        '<div class="config-grid">' +
+          '<div class="config-group">' +
+            '<label>Severidade</label>' +
+            '<select id="qaBugSeverity">' +
+              '<option value="Crítico">Crítico</option>' +
+              '<option value="Alto" selected>Alto</option>' +
+              '<option value="Médio">Médio</option>' +
+              '<option value="Baixo">Baixo</option>' +
+            '</select>' +
+          '</div>' +
+          '<div class="config-group">' +
+            '<label>Ambiente</label>' +
+            '<select id="qaBugEnv">' +
+              '<option value="Produção">Produção</option>' +
+              '<option value="Homologação" selected>Homologação</option>' +
+              '<option value="Staging">Staging</option>' +
+              '<option value="Desenvolvimento">Desenvolvimento</option>' +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+        '<div class="form-actions">' +
+          '<button class="btn-primary" id="btnGenBug" onclick="generateBugReport()"><i class="fas fa-wand-magic-sparkles"></i> Gerar Bug Report</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="output-panel" id="qaBugOutput" style="display:none;">' +
+        '<div class="output-header">' +
+          '<span class="output-header-title"><i class="fas fa-file-lines"></i> Bug Report</span>' +
+          '<button class="btn-secondary" onclick="copyOutput(\'qaBugOutputBody\')" style="padding:6px 12px;font-size:0.8rem;"><i class="fas fa-copy"></i> Copiar</button>' +
+        '</div>' +
+        '<div class="output-body" id="qaBugOutputBody"></div>' +
+      '</div>' +
+    '</div>';
 }
 
-function renderHelpContent(tab) {
-  var data = helpContent[tab];
-  if (!data) { document.getElementById('helpBody').innerHTML = '<p class="text-sm text-muted">Sem ajuda disponível.</p>'; return; }
+async function generateBugReport() {
+  const input = document.getElementById('qaBugInput').value.trim();
+  if (!input) { showAlertDialog('Atenção', 'Descreva o bug encontrado.'); return; }
+  const severity = document.getElementById('qaBugSeverity').value;
+  const env = document.getElementById('qaBugEnv').value;
+  const outputPanel = document.getElementById('qaBugOutput');
+  const outputBody = document.getElementById('qaBugOutputBody');
+  const btn = document.getElementById('btnGenBug');
+  outputPanel.style.display = 'block';
+  outputBody.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div><div class="text-muted text-sm" style="margin-top:8px;">Estruturando bug report...</div>';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
 
-  var html = '';
+  const prompt = 'Você é um QA Engineer sênior. Estruture um bug report profissional e detalhado baseado na descrição abaixo:\n\n' +
+    '--- DESCRIÇÃO ---\n' + input + '\n--- FIM ---\n\n' +
+    'Severidade: ' + severity + '\nAmbiente: ' + env + '\n\n' +
+    'O bug report DEVE seguir este formato:\n' +
+    '# [BUG-XXX] Título descritivo\n' +
+    '## Informações Gerais\n- Severidade | Prioridade | Ambiente | Módulo | Data\n' +
+    '## Descrição\n## Pré-condições\n## Passos para Reproduzir\n## Resultado Atual\n## Resultado Esperado\n## Evidências (sugestão)\n## Impacto\n## Possível Causa Raiz\n## Sugestão de Correção\n\n' +
+    'Seja detalhado e profissional. Use markdown. Responda em português.';
 
-  data.sections.forEach(function(section) {
-    html += '<div class="help-section">';
-    html += '<div class="help-section-title"><i class="fas ' + section.icon + '"></i> ' + section.title + '</div>';
-    section.steps.forEach(function(step, i) {
-      html += '<div class="help-step"><div class="help-step-num">' + (i + 1) + '</div><p>' + step + '</p></div>';
-    });
-    html += '</div>';
+  await sendToAI(prompt, outputBody, function() {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Gerar Bug Report';
   });
-
-  if (data.tip) {
-    html += '<div class="help-tip"><i class="fas fa-lightbulb"></i><span>' + data.tip + '</span></div>';
-  }
-
-  document.getElementById('helpBody').innerHTML = html;
 }
 
-/* Auto-update help when tab changes */
-document.querySelectorAll('.tab-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    if (helpOpen) {
-      setTimeout(function() {
-        renderHelpNav();
-        renderHelpForActiveTab();
-      }, 50);
+// ---- QA: Test Plan ----
+function renderTestPlan(container) {
+  container.innerHTML =
+    '<div class="content-header">' +
+      '<div class="content-title"><i class="fas fa-clipboard-list text-accent"></i> Gerador de Plano de Teste</div>' +
+      '<div class="content-desc">Descreva o projeto ou sprint e receba um plano de teste completo.</div>' +
+    '</div>' +
+    '<div class="content-body">' +
+      '<div class="form-panel">' +
+        '<div class="form-group">' +
+          '<label>Descrição do Projeto / Sprint / Feature</label>' +
+          '<textarea id="qaTestPlanInput" placeholder="Ex: Sprint 15 - Módulo de Pagamentos\nFeatures: Integração com gateway de pagamento, parcelamento, cupons de desconto, checkout via PIX.\nPrazo: 2 semanas\nEquipe: 2 QAs" rows="6"></textarea>' +
+        '</div>' +
+        '<div class="form-actions">' +
+          '<button class="btn-primary" id="btnGenPlan" onclick="generateTestPlan()"><i class="fas fa-wand-magic-sparkles"></i> Gerar Plano de Teste</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="output-panel" id="qaTestPlanOutput" style="display:none;">' +
+        '<div class="output-header">' +
+          '<span class="output-header-title"><i class="fas fa-file-lines"></i> Plano de Teste</span>' +
+          '<button class="btn-secondary" onclick="copyOutput(\'qaTestPlanOutputBody\')" style="padding:6px 12px;font-size:0.8rem;"><i class="fas fa-copy"></i> Copiar</button>' +
+        '</div>' +
+        '<div class="output-body" id="qaTestPlanOutputBody"></div>' +
+      '</div>' +
+    '</div>';
+}
+
+async function generateTestPlan() {
+  const input = document.getElementById('qaTestPlanInput').value.trim();
+  if (!input) { showAlertDialog('Atenção', 'Descreva o projeto ou sprint.'); return; }
+  const outputPanel = document.getElementById('qaTestPlanOutput');
+  const outputBody = document.getElementById('qaTestPlanOutputBody');
+  const btn = document.getElementById('btnGenPlan');
+  outputPanel.style.display = 'block';
+  outputBody.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div><div class="text-muted text-sm" style="margin-top:8px;">Gerando plano de teste...</div>';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+
+  const prompt = 'Você é um QA Lead sênior. Crie um plano de teste completo e profissional:\n\n' +
+    '--- CONTEXTO ---\n' + input + '\n--- FIM ---\n\n' +
+    'O plano DEVE incluir:\n' +
+    '1. **Objetivo e Escopo** - O que será testado e o que não será\n' +
+    '2. **Abordagem de Teste** - Estratégia (manual, automatizado, exploratório)\n' +
+    '3. **Cronograma** - Fases e estimativas de tempo\n' +
+    '4. **Recursos Necessários** - Equipe, ferramentas, ambientes\n' +
+    '5. **Critérios de Entrada** - O que precisa estar pronto para iniciar\n' +
+    '6. **Critérios de Saída** - Quando os testes serão considerados completos\n' +
+    '7. **Tipos de Teste** - Funcional, regressão, performance, segurança, etc.\n' +
+    '8. **Riscos e Mitigações**\n' +
+    '9. **Métricas de Qualidade**\n' +
+    '10. **Matriz de Rastreabilidade** (sugestão de estrutura)\n\n' +
+    'Use markdown com formatação profissional. Responda em português.';
+
+  await sendToAI(prompt, outputBody, function() {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Gerar Plano de Teste';
+  });
+}
+
+// ---- QA: Performance ----
+function renderPerformance(container) {
+  container.innerHTML =
+    '<div class="content-header">' +
+      '<div class="content-title"><i class="fas fa-gauge-high text-accent"></i> Testes de Performance</div>' +
+      '<div class="content-desc">Receba estratégias, scripts e métricas para testes de carga e performance.</div>' +
+    '</div>' +
+    '<div class="content-body">' +
+      '<div class="form-panel">' +
+        '<div class="form-group">' +
+          '<label>Descrição do Sistema / Endpoints</label>' +
+          '<textarea id="qaPerfInput" placeholder="Ex: API de e-commerce com os endpoints:\n- GET /products (listagem, paginação)\n- POST /cart (adicionar ao carrinho)\n- POST /checkout (processar pagamento)\n\nExpectativa: 1000 usuários simultâneos, tempo de resposta < 500ms" rows="6"></textarea>' +
+        '</div>' +
+        '<div class="config-grid">' +
+          '<div class="config-group">' +
+            '<label>Ferramenta</label>' +
+            '<select id="qaPerfTool">' +
+              '<option value="K6">K6</option>' +
+              '<option value="JMeter">JMeter</option>' +
+              '<option value="Artillery">Artillery</option>' +
+              '<option value="Locust">Locust</option>' +
+              '<option value="Gatling">Gatling</option>' +
+            '</select>' +
+          '</div>' +
+          '<div class="config-group">' +
+            '<label>Tipo de Teste</label>' +
+            '<select id="qaPerfType">' +
+              '<option value="Carga">Carga (Load)</option>' +
+              '<option value="Stress">Stress</option>' +
+              '<option value="Spike">Spike</option>' +
+              '<option value="Endurance">Endurance (Soak)</option>' +
+              '<option value="Scalability">Escalabilidade</option>' +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+        '<div class="form-actions">' +
+          '<button class="btn-primary" id="btnGenPerf" onclick="generatePerformanceTest()"><i class="fas fa-wand-magic-sparkles"></i> Gerar Teste de Performance</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="output-panel" id="qaPerfOutput" style="display:none;">' +
+        '<div class="output-header">' +
+          '<span class="output-header-title"><i class="fas fa-file-code"></i> Teste de Performance</span>' +
+          '<button class="btn-secondary" onclick="copyOutput(\'qaPerfOutputBody\')" style="padding:6px 12px;font-size:0.8rem;"><i class="fas fa-copy"></i> Copiar</button>' +
+        '</div>' +
+        '<div class="output-body" id="qaPerfOutputBody"></div>' +
+      '</div>' +
+    '</div>';
+}
+
+async function generatePerformanceTest() {
+  const input = document.getElementById('qaPerfInput').value.trim();
+  if (!input) { showAlertDialog('Atenção', 'Descreva o sistema e endpoints.'); return; }
+  const tool = document.getElementById('qaPerfTool').value;
+  const type = document.getElementById('qaPerfType').value;
+  const outputPanel = document.getElementById('qaPerfOutput');
+  const outputBody = document.getElementById('qaPerfOutputBody');
+  const btn = document.getElementById('btnGenPerf');
+  outputPanel.style.display = 'block';
+  outputBody.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div><div class="text-muted text-sm" style="margin-top:8px;">Gerando teste de performance...</div>';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+
+  const prompt = 'Você é um especialista em testes de performance. Gere um teste completo:\n\n' +
+    '--- SISTEMA ---\n' + input + '\n--- FIM ---\n\n' +
+    'Ferramenta: ' + tool + '\nTipo de teste: ' + type + '\n\n' +
+    'Inclua:\n' +
+    '1. Script completo e funcional na ferramenta especificada\n' +
+    '2. Configuração de cenários (ramp-up, duration, VUs)\n' +
+    '3. Thresholds e métricas a monitorar\n' +
+    '4. Assertions de performance\n' +
+    '5. Instruções de execução\n' +
+    '6. Como interpretar os resultados\n' +
+    '7. Recomendações de otimização\n\n' +
+    'Use markdown e code blocks. Responda em português.';
+
+  await sendToAI(prompt, outputBody, function() {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Gerar Teste de Performance';
+  });
+}
+
+// ---- JSON Formatter (client-side utility) ----
+function renderJSONFormatter(container) {
+  container.innerHTML =
+    '<div class="content-header">' +
+      '<div class="content-title"><i class="fas fa-brackets-curly text-accent"></i> JSON Formatter & Validator</div>' +
+      '<div class="content-desc">Cole JSON para formatar, validar e visualizar. Funciona 100% offline.</div>' +
+    '</div>' +
+    '<div class="content-body">' +
+      '<div class="form-panel">' +
+        '<div class="form-group">' +
+          '<label>Input JSON</label>' +
+          '<textarea id="jsonInput" placeholder="Cole seu JSON aqui..." rows="8" style="font-family:var(--font-code);font-size:14px;"></textarea>' +
+        '</div>' +
+        '<div class="form-actions">' +
+          '<button class="btn-primary" onclick="formatJSON()"><i class="fas fa-wand-magic-sparkles"></i> Formatar</button>' +
+          '<button class="btn-secondary" onclick="minifyJSON()"><i class="fas fa-compress"></i> Minificar</button>' +
+          '<button class="btn-secondary" onclick="validateJSON()"><i class="fas fa-check-circle"></i> Validar</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="output-panel" id="jsonOutputPanel" style="display:none;">' +
+        '<div class="output-header">' +
+          '<span class="output-header-title" id="jsonOutputTitle"><i class="fas fa-file-code"></i> Resultado</span>' +
+          '<button class="btn-secondary" onclick="copyOutput(\'jsonOutputBody\')" style="padding:6px 12px;font-size:0.8rem;"><i class="fas fa-copy"></i> Copiar</button>' +
+        '</div>' +
+        '<div class="output-body" id="jsonOutputBody" style="font-family:var(--font-code);font-size:13px;white-space:pre-wrap;word-break:break-all;"></div>' +
+      '</div>' +
+    '</div>';
+}
+
+function formatJSON() {
+  const input = document.getElementById('jsonInput').value.trim();
+  const panel = document.getElementById('jsonOutputPanel');
+  const body = document.getElementById('jsonOutputBody');
+  const title = document.getElementById('jsonOutputTitle');
+  panel.style.display = 'block';
+  if (!input) { body.innerHTML = '<span style="color:var(--warning)">Nenhum JSON fornecido.</span>'; return; }
+  try {
+    const parsed = JSON.parse(input);
+    body.textContent = JSON.stringify(parsed, null, 2);
+    title.innerHTML = '<i class="fas fa-check-circle" style="color:var(--success)"></i> JSON Válido — Formatado';
+    showToast('JSON formatado com sucesso!', 'success');
+  } catch(e) {
+    body.innerHTML = '<span style="color:var(--error)"><i class="fas fa-times-circle"></i> JSON Inválido: ' + escapeHTML(e.message) + '</span>';
+    title.innerHTML = '<i class="fas fa-times-circle" style="color:var(--error)"></i> Erro de Parse';
+  }
+}
+
+function minifyJSON() {
+  const input = document.getElementById('jsonInput').value.trim();
+  const panel = document.getElementById('jsonOutputPanel');
+  const body = document.getElementById('jsonOutputBody');
+  const title = document.getElementById('jsonOutputTitle');
+  panel.style.display = 'block';
+  if (!input) { body.innerHTML = '<span style="color:var(--warning)">Nenhum JSON fornecido.</span>'; return; }
+  try {
+    const parsed = JSON.parse(input);
+    body.textContent = JSON.stringify(parsed);
+    title.innerHTML = '<i class="fas fa-check-circle" style="color:var(--success)"></i> JSON Minificado';
+    showToast('JSON minificado!', 'success');
+  } catch(e) {
+    body.innerHTML = '<span style="color:var(--error)"><i class="fas fa-times-circle"></i> JSON Inválido: ' + escapeHTML(e.message) + '</span>';
+  }
+}
+
+function validateJSON() {
+  const input = document.getElementById('jsonInput').value.trim();
+  const panel = document.getElementById('jsonOutputPanel');
+  const body = document.getElementById('jsonOutputBody');
+  const title = document.getElementById('jsonOutputTitle');
+  panel.style.display = 'block';
+  if (!input) { body.innerHTML = '<span style="color:var(--warning)">Nenhum JSON fornecido.</span>'; return; }
+  try {
+    const parsed = JSON.parse(input);
+    const keys = typeof parsed === 'object' && parsed !== null ? Object.keys(parsed).length : 0;
+    const isArray = Array.isArray(parsed);
+    body.innerHTML = '<div style="color:var(--success);font-weight:600;margin-bottom:12px;"><i class="fas fa-check-circle"></i> JSON Válido!</div>' +
+      '<div>Tipo: <strong>' + (isArray ? 'Array' : typeof parsed) + '</strong></div>' +
+      (isArray ? '<div>Elementos: <strong>' + parsed.length + '</strong></div>' : '<div>Chaves (raiz): <strong>' + keys + '</strong></div>') +
+      '<div>Tamanho: <strong>' + new Blob([input]).size + ' bytes</strong></div>';
+    title.innerHTML = '<i class="fas fa-check-circle" style="color:var(--success)"></i> Validação';
+    showToast('JSON válido!', 'success');
+  } catch(e) {
+    body.innerHTML = '<div style="color:var(--error);font-weight:600;margin-bottom:12px;"><i class="fas fa-times-circle"></i> JSON Inválido</div><div>' + escapeHTML(e.message) + '</div>';
+    title.innerHTML = '<i class="fas fa-times-circle" style="color:var(--error)"></i> Validação';
+  }
+}
+
+// ---- HTTP Reference ----
+function renderHTTPReference(container) {
+  const codes = [
+    { code: '200', name: 'OK', desc: 'Requisição bem-sucedida', cat: 'success' },
+    { code: '201', name: 'Created', desc: 'Recurso criado com sucesso', cat: 'success' },
+    { code: '204', name: 'No Content', desc: 'Sucesso sem corpo de resposta', cat: 'success' },
+    { code: '301', name: 'Moved Permanently', desc: 'Recurso movido permanentemente', cat: 'redirect' },
+    { code: '302', name: 'Found', desc: 'Redirecionamento temporário', cat: 'redirect' },
+    { code: '304', name: 'Not Modified', desc: 'Recurso não modificado (cache)', cat: 'redirect' },
+    { code: '400', name: 'Bad Request', desc: 'Requisição mal formada', cat: 'client' },
+    { code: '401', name: 'Unauthorized', desc: 'Autenticação necessária', cat: 'client' },
+    { code: '403', name: 'Forbidden', desc: 'Acesso negado', cat: 'client' },
+    { code: '404', name: 'Not Found', desc: 'Recurso não encontrado', cat: 'client' },
+    { code: '405', name: 'Method Not Allowed', desc: 'Método HTTP não permitido', cat: 'client' },
+    { code: '409', name: 'Conflict', desc: 'Conflito com estado atual', cat: 'client' },
+    { code: '422', name: 'Unprocessable Entity', desc: 'Entidade não processável', cat: 'client' },
+    { code: '429', name: 'Too Many Requests', desc: 'Rate limit excedido', cat: 'client' },
+    { code: '500', name: 'Internal Server Error', desc: 'Erro interno do servidor', cat: 'server' },
+    { code: '502', name: 'Bad Gateway', desc: 'Resposta inválida do upstream', cat: 'server' },
+    { code: '503', name: 'Service Unavailable', desc: 'Serviço indisponível', cat: 'server' },
+    { code: '504', name: 'Gateway Timeout', desc: 'Timeout do gateway', cat: 'server' }
+  ];
+  const catColors = { success: 'var(--success)', redirect: 'var(--accent)', client: 'var(--warning)', server: 'var(--error)' };
+
+  container.innerHTML =
+    '<div class="content-header">' +
+      '<div class="content-title"><i class="fas fa-globe text-accent"></i> HTTP Status Code Reference</div>' +
+      '<div class="content-desc">Referência rápida dos códigos HTTP mais utilizados.</div>' +
+    '</div>' +
+    '<div class="content-body">' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">' +
+        codes.map(function(c) {
+          return '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;border-left:4px solid ' + catColors[c.cat] + ';">' +
+            '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">' +
+              '<span style="font-family:var(--font-code);font-weight:700;font-size:1.1rem;color:' + catColors[c.cat] + ';">' + c.code + '</span>' +
+              '<span style="font-weight:600;font-size:0.92rem;">' + c.name + '</span>' +
+            '</div>' +
+            '<div style="color:var(--text-secondary);font-size:0.82rem;">' + c.desc + '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+}
+
+// ---- Generic AI Send ----
+async function sendToAI(prompt, outputBody, onComplete) {
+  const handlerName = 'generic-handler-' + Date.now();
+  window.Poe.registerHandler(handlerName, function(result) {
+    const msg = result.responses[0];
+    if (msg.status === 'error') {
+      outputBody.innerHTML = '<span style="color:var(--error)"><i class="fas fa-exclamation-triangle"></i> Erro: ' + (msg.statusText || 'Erro ao gerar resposta') + '</span>';
+      if (onComplete) onComplete();
+    } else if (msg.status === 'incomplete' || msg.status === 'complete') {
+      outputBody.innerHTML = renderMarkdown(msg.content);
+      if (msg.status === 'complete') {
+        enhanceCodeBlocks(outputBody.parentElement);
+        if (onComplete) onComplete();
+      }
     }
   });
-});
+
+  try {
+    await window.Poe.sendUserMessage('@Claude-Sonnet-4.5 ' + prompt, {
+      handler: handlerName,
+      stream: true,
+      openChat: false,
+      parameters: {}
+    });
+  } catch (err) {
+    outputBody.innerHTML = '<span style="color:var(--error)"><i class="fas fa-exclamation-triangle"></i> Erro: ' + escapeHTML(String(err)) + '</span>';
+    if (onComplete) onComplete();
+  }
+}
+
+// ---- Message Helpers ----
+function appendMessage(container, text, isUser) {
+  const div = document.createElement('div');
+  div.className = 'message';
+  div.innerHTML =
+    '<div class="msg-avatar ' + (isUser ? 'user' : 'ai') + '">' + (isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>') + '</div>' +
+    '<div class="msg-body">' +
+      '<div class="msg-name">' + (isUser ? 'Você' : 'NEXUS AI') + '</div>' +
+      '<div class="msg-content">' + (isUser ? escapeHTML(text) : renderMarkdown(text)) + '</div>' +
+    '</div>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function appendLoadingMessage(container, id) {
+  const div = document.createElement('div');
+  div.className = 'message';
+  div.id = id;
+  div.innerHTML =
+    '<div class="msg-avatar ai"><i class="fas fa-robot"></i></div>' +
+    '<div class="msg-body">' +
+      '<div class="msg-name">NEXUS AI</div>' +
+      '<div class="msg-content"><div class="typing-indicator"><span></span><span></span><span></span></div></div>' +
+    '</div>';
+  container.appendChild(div);
+}
+
+// ---- Markdown Rendering ----
+function renderMarkdown(text) {
+  if (!text) return '';
+  try {
+    return marked.parse(text);
+  } catch(e) {
+    return escapeHTML(text);
+  }
+}
+
+// ---- Code Block Enhancement (copy button) ----
+function enhanceCodeBlocks(container) {
+  if (!container) return;
+  const pres = container.querySelectorAll('pre');
+  pres.forEach(function(pre) {
+    if (pre.querySelector('.code-header')) return;
+    const code = pre.querySelector('code');
+    if (!code) return;
+    let lang = '';
+    if (code.className) {
+      const match = code.className.match(/language-(\w+)/);
+      if (match) lang = match[1];
+    }
+    const header = document.createElement('div');
+    header.className = 'code-header';
+    header.innerHTML = '<span>' + (lang || 'code') + '</span><button class="btn-copy" onclick="copyCodeBlock(this)"><i class="fas fa-copy"></i> Copiar</button>';
+    pre.insertBefore(header, pre.firstChild);
+  });
+}
+
+function copyCodeBlock(btn) {
+  const pre = btn.closest('pre');
+  const code = pre.querySelector('code');
+  if (code) {
+    const text = code.textContent;
+    try {
+      navigator.clipboard.writeText(text);
+      btn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+      setTimeout(function() { btn.innerHTML = '<i class="fas fa-copy"></i> Copiar'; }, 2000);
+    } catch(e) {
+      showToast('Erro ao copiar', 'error');
+    }
+  }
+}
+
+function copyOutput(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const text = el.textContent || el.innerText;
+  try {
+    navigator.clipboard.writeText(text);
+    showToast('Copiado para a área de transferência!', 'success');
+  } catch(e) {
+    showToast('Erro ao copiar', 'error');
+  }
+}
+
+// ---- Escape Helpers ----
+function escapeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function escapeAttr(str) {
+  return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 </script>
 </body>
 </html>
